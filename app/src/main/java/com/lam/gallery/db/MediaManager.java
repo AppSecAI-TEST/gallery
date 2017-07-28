@@ -19,7 +19,7 @@ public class MediaManager {
 
     public List<Media> findAllMedia() {
         List<Media> mediaList = new ArrayList<>();
-        Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
+        Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, "date_added desc");
         Log.d(TAG, "init: " + cursor.getCount());
         while(cursor.moveToNext()) {
             //获取图片名

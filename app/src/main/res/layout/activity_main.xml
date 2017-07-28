@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.lam.gallery.MainActivity">
+    android:background="@color/colorPrimary"
+    tools:context="com.lam.gallery.activity.MainActivity">
 
     <RelativeLayout
         android:id="@+id/gallery_title"
@@ -18,15 +19,15 @@
             android:id="@+id/iv_title_left_point"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/left_point_16_white"
+            android:src="@drawable/back_32"
             android:paddingLeft="10dp"
             android:layout_centerVertical="true"/>
 
         <View
             android:id="@+id/view_title_line"
-            android:layout_width="2dp"
-            android:layout_height="40dp"
-            android:background="#f8403f3f"
+            android:layout_width="1dp"
+            android:layout_height="32dp"
+            android:background="#cb1a1a1a"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/iv_title_left_point"
             android:layout_margin="10dp" />
@@ -34,14 +35,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFF"
+            android:textColor="#ffffff"
             android:text="所有图片"
+            android:textStyle="bold"
             android:layout_centerVertical="true"
             android:layout_margin="10dp"
             android:textSize="20sp"
             android:layout_toRightOf="@+id/view_title_line"/>
 
         <Button
+            android:id="@+id/bt_title_send"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:text="发送"
@@ -55,7 +58,7 @@
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rl_gallery_grid"
+        android:id="@+id/rv_gallery_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/rl_gallery_footer"
@@ -91,24 +94,29 @@
             />
 
         <ImageView
+            android:id="@+id/iv_footer_origin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:src="@drawable/footer_circle_16"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:paddingRight="35dp"/>
 
         <TextView
+            android:id="@+id/tv_footer_origin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="原图"
             android:textColor="#fff"
             android:textSize="18sp"
             android:paddingLeft="35dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"/>
 
         <TextView
+            android:id="@+id/tv_footer_preview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="预览"
