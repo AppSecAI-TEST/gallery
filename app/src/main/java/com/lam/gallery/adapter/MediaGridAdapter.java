@@ -26,19 +26,23 @@ import java.util.HashSet;
  * Created by lenovo on 2017/7/28.
  */
 
-public class RecyclerViewGridAdapter extends RecyclerView.Adapter{
-    private static final String TAG = "RecyclerViewGridAdapter";
+public class MediaGridAdapter extends RecyclerView.Adapter{
+    private static final String TAG = "MediaGridAdapter";
     private Context mContext;
     private HashSet<String> mSelectSet;
     private SparseArrayCompat<String> mMediaPathArray;
     private Button mBtSend;
     private TextView mTvPreview;
 
-    public RecyclerViewGridAdapter(SparseArrayCompat<String> mediaPathArray, Button btSend, TextView tvPreview) {
+    public MediaGridAdapter(SparseArrayCompat<String> mediaPathArray, Button btSend, TextView tvPreview) {
         mMediaPathArray = mediaPathArray;
         mSelectSet = new HashSet<>();
         mBtSend = btSend;
         mTvPreview = tvPreview;
+    }
+
+    public void setMediaPathArray(SparseArrayCompat<String> mediaPathArray) {
+        mMediaPathArray = mediaPathArray;
     }
 
     public HashSet<String> getSelectSet() {
@@ -49,7 +53,7 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter{
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid, null);
-        final GridViewHolder gridViewHolder = new GridViewHolder(view);
+        GridViewHolder gridViewHolder = new GridViewHolder(view);
         return gridViewHolder;
     }
 

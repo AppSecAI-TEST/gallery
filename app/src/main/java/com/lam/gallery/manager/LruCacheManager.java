@@ -1,8 +1,12 @@
 package com.lam.gallery.manager;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.util.LruCache;
+
+import com.lam.gallery.GalleryApplication;
+import com.lam.gallery.R;
 
 /**
  * Created by lenovo on 2017/7/28.
@@ -46,7 +50,7 @@ public class LruCacheManager {
      * @return 当缓存中没有该bitm时，返回 null
      */
     public static Bitmap getBitmapFromCache(String key) {
-        return getLruCache().get(key);
+        return key == null? BitmapFactory.decodeResource(GalleryApplication.getContext().getResources(), R.drawable.loading) : getLruCache().get(key);
     }
 
 }

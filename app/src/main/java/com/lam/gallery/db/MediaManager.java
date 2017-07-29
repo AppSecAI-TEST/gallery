@@ -2,6 +2,7 @@ package com.lam.gallery.db;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
+import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 
 import com.lam.gallery.GalleryApplication;
@@ -36,19 +37,22 @@ public class MediaManager {
         return mediaList;
     }
 
-    public List<Media> findMediaByFileName(String fileName) {
-        List<Media> mediaList = new ArrayList<>();
-        Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, "bucket_display_name = ?", new String[] {fileName}, null);
+    public SparseArrayCompat<String> findMediaByFileName(String fileName) {
+//        List<Media> mediaList = new ArrayList<>();
+        SparseArrayCompat<String> selectFilePictureArray = new SparseArrayCompat<>();
+        int pos = 0;
+        Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, "bucket_display_name = ?", new String[] {fileName}, "date_added desc");
         while(cursor.moveToNext()) {
             //获取图片名
-            String name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
+//            String name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
             //获取图片保存路径
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-
-            String storeDate = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
-
-            mediaList.add(new Media(name, path, fileName, storeDate));
+//            String storeDate = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED));
+            selectFilePictureArray.put(pos, path);
+            ++pos;
+//            mediaList.add(new Media(name, path, fileName, storeDate));
         }
-        return mediaList;
+//        return mediaList;
+        return selectFilePictureArray;
     }
 }
