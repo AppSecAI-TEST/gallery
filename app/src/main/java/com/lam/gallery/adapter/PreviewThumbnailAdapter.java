@@ -21,10 +21,15 @@ import java.util.HashSet;
  */
 
 //需要外调接口给previewActivity处理点击时viewPager大图也变化的事件
-public class PreviewThumbnailAdapter extends RecyclerView.Adapter {
+public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements View.OnClickListener {
     private HashSet<String> mSelectSet;
     private SparseArrayCompat<String> mMediaPathArray;
     private int mSelectPos;
+    private static OnSelectThumbnail sOnSelectThumbnail;
+
+    public static void setOnSelectThumbnail(OnSelectThumbnail onSelectThumbnail) {
+        sOnSelectThumbnail = onSelectThumbnail;
+    }
 
     public PreviewThumbnailAdapter(HashSet<String> selectSet, SparseArrayCompat<String> mediaPathArray, int selectPos) {
         mSelectSet = selectSet;
@@ -32,10 +37,16 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter {
         mSelectPos = selectPos;
     }
 
+
+    public void setSelectPos(int selectPos) {
+        mSelectPos = selectPos;
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_preview_thumbnail, null);
         ThumbnailViewHolder holder = new ThumbnailViewHolder(view);
+        view.setOnClickListener(this);
         return holder;
     }
 
@@ -46,6 +57,8 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter {
         //默认初始化防止复用的问题
         thumbnailViewHolder.getSelectedView().setVisibility(View.INVISIBLE);
         thumbnailImage.setTag(position);
+        holder.itemView.setTag(position);
+
         //开始渲染绑定
         if(mSelectPos == (int) thumbnailImage.getTag()) {
             thumbnailViewHolder.getSelectedView().setVisibility(View.VISIBLE);
@@ -70,7 +83,6 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter {
         } else {
             thumbnailImage.setImageBitmap(bitmap);
         }
-
     }
 
     @Override
@@ -92,5 +104,16 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter {
         public SquareImageView getThumbnailImage() {
             return mThumbnailImage;
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(sOnSelectThumbnail != null) {
+            sOnSelectThumbnail.onSelect((int) v.getTag());
+        }
+    }
+
+    public interface OnSelectThumbnail {
+        void onSelect(int position);
     }
 }

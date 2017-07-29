@@ -31,7 +31,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewActivity extends AppCompatActivity implements PreViewViewPager.OnClickItemViewListener{
+public class PreviewActivity extends AppCompatActivity implements PreViewViewPager.OnClickItemViewListener, PreviewThumbnailAdapter.OnSelectThumbnail {
     private static final String TAG = "PreviewActivity";
     @BindView(R.id.vp_preview)
     PreViewViewPager mVpPreview;
@@ -114,6 +114,7 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
             }
         }
         mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
+        mPreviewThumbnailAdapter.setOnSelectThumbnail(this);
     }
 
     @Override
@@ -229,5 +230,13 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
         });
         headerAnimator.start();
         footerAnimator.setStartDelay(300);
+    }
+
+    @Override
+    public void onSelect(int position) {
+        mPreviewThumbnailAdapter.setSelectPos(position);
+        mPreviewThumbnailAdapter.notifyDataSetChanged();
+        //viewPager也要改变
+        //。。。
     }
 }
