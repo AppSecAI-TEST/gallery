@@ -9,11 +9,11 @@ import android.graphics.BitmapFactory;
 
 public class BitmapManager {
 
-    public static Bitmap processBitmap(String path) {
+    public static Bitmap processBitmap(String path, int SIZE) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
-        int inSampleSize = calculateInSampleSize(options, 100, 100);
+        int inSampleSize = calculateInSampleSize(options, SIZE, SIZE);
         options.inJustDecodeBounds = false;
         options.inSampleSize = inSampleSize;
         return BitmapFactory.decodeFile(path, options);

@@ -68,7 +68,7 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
             MediaTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position));
+                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 80);
                     LruCacheManager.addBitmapToCache(mMediaPathArray.get(position), bitmap);
                     thumbnailImage.post(new Runnable() {
                         @Override

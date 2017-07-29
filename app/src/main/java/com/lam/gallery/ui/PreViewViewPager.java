@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -26,23 +25,23 @@ public class PreViewViewPager extends ViewPager {
         sOnClickItemViewListener = onClickItemViewListener;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                isMove = false;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                isMove = true;
-                break;
-            case MotionEvent.ACTION_UP:
-                if(sOnClickItemViewListener != null && ! isMove) {
-                    sOnClickItemViewListener.onClickItem(this);
-                }
-                isMove = false;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent ev) {
+//        switch (ev.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                isMove = false;
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                isMove = true;
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                if(sOnClickItemViewListener != null && ! isMove) {
+//                    sOnClickItemViewListener.onClickItem(this);
+//                }
+//                isMove = false;
+//        }
+//        return false;
+//    }
 
     public interface OnClickItemViewListener {
         void onClickItem(View v);

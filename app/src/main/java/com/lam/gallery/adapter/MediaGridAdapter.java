@@ -85,7 +85,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
             MediaTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position));
+                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 100);
                     LruCacheManager.addBitmapToCache(mMediaPathArray.get(position), bitmap);
                     gridViewImageItem.post(new Runnable() {
                         @Override

@@ -17,9 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lam.gallery.R;
 import com.lam.gallery.adapter.PreviewThumbnailAdapter;
+import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaManager;
 import com.lam.gallery.ui.PreViewViewPager;
@@ -74,6 +76,8 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
     private int mCurrentPosition;
     private LinearLayoutManager mLinearLayoutManager;
     private PreviewThumbnailAdapter mPreviewThumbnailAdapter;
+    private PreviewViewpagerAdapter mPreviewViewpagerAdapter;
+    private static boolean PREVIEW_MODE;
 
     public static void start(Context context, HashSet<String> selectSet, String fileName, boolean isOriginMedia, int currentPosition) {
         Intent starter = new Intent(context, PreviewActivity.class);
@@ -115,6 +119,7 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
         }
         mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
         mPreviewThumbnailAdapter.setOnSelectThumbnail(this);
+
     }
 
     @Override
@@ -150,6 +155,7 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
         }
 
         if(fileName == null) {
+            PREVIEW_MODE = true;
             mMediaPathArray = mSelectedMediaArray.clone();
         } else if(! fileName.equals("所有图片")) {
             mMediaPathArray = mMediaManager.findMediaByFileName(fileName);
@@ -184,7 +190,15 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
             mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
         }
 
-
+        mPreviewViewpagerAdapter = new PreviewViewpagerAdapter(null);
+        mVpPreview.setAdapter(mPreviewViewpagerAdapter);
+        if(fileName == null) {
+            mPreviewViewpagerAdapter.setMediaPathArray(mSelectedMediaArray);
+        } else {
+            mPreviewViewpagerAdapter.setMediaPathArray(mMediaPathArray);
+        }
+        mPreviewViewpagerAdapter.notifyDataSetChanged();
+        mVpPreview.setCurrentItem(mCurrentPosition);
     }
 
     /**
@@ -237,6 +251,18 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
         mPreviewThumbnailAdapter.setSelectPos(position);
         mPreviewThumbnailAdapter.notifyDataSetChanged();
         //viewPager也要改变
-        //。。。
+//        mSelectedMediaArray.get(position);   //得到点击位的url// 查找mMedia中有无
+        String clickPath = mSelectedMediaArray.get(position);
+        if(PREVIEW_MODE) {
+            mVpPreview.setCurrentItem(mMediaPathArray.indexOfValue(clickPath));
+        } else {
+            for(int i = 0; i < mMediaPathArray.size(); ++i) {
+                if(clickPath.equals(mMediaPathArray.get(i))) {
+                    mVpPreview.setCurrentItem(i);
+                    return;
+                }
+            }
+            Toast.makeText(this, "暂时不支持查看该文件大图", Toast.LENGTH_SHORT).show();
+        }
     }
 }

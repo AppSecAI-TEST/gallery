@@ -88,7 +88,7 @@ public class FilesListAdapter extends RecyclerView.Adapter implements View.OnCli
             MediaTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mFileCoverArray.get(position));
+                    final Bitmap bitmap = BitmapManager.processBitmap(mFileCoverArray.get(position), 90);
                     LruCacheManager.addBitmapToCache(mFileCoverArray.get(position), bitmap);
                     fileListViewHolder.getFileCover().post(new Runnable() {
                         @Override
