@@ -80,6 +80,7 @@
         </android.support.v7.widget.RecyclerView>
 
 
+
         <RelativeLayout
             android:id="@+id/rl_preview_footer"
             android:layout_width="match_parent"
@@ -87,6 +88,12 @@
             android:background="#e4292b29"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#b2bababa"
+                android:layout_alignParentTop="true"/>
 
             <TextView
                 android:id="@+id/tv_footer_edit"

@@ -7,7 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -17,11 +19,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.adapter.PreviewThumbnailAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaManager;
 import com.lam.gallery.ui.PreViewViewPager;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,10 +67,13 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
 
     private HashSet<String> mSelectSet;
     private SparseArrayCompat<String> mMediaPathArray;
+    private SparseArrayCompat<String> mSelectedMediaArray;
     private boolean isOriginMedia;
     private MediaManager mMediaManager;
     public int MAX_HEIGHT;
     private int mCurrentPosition;
+    private LinearLayoutManager mLinearLayoutManager;
+    private PreviewThumbnailAdapter mPreviewThumbnailAdapter;
 
     public static void start(Context context, HashSet<String> selectSet, String fileName, boolean isOriginMedia, int currentPosition) {
         Intent starter = new Intent(context, PreviewActivity.class);
@@ -87,8 +94,27 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
 
         mVpPreview.setOnClickItemViewListener(this);
         initialization();
-    }
 
+        //判断进入通道是否是被选择的图片，是，标注该图片为绿色，否则，第0个是绿
+        mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(mSelectSet, mSelectedMediaArray, 0);
+        if(mCurrentPosition != -1) {
+            if(mSelectSet.contains(mMediaPathArray.get(mCurrentPosition))) {
+                String enterPath = mMediaPathArray.get(mCurrentPosition);
+                Log.d(TAG, "onCreate: enterPath" + enterPath);
+                for (int i = 0; i < mSelectedMediaArray.size(); ++i) {
+                    String path = mSelectedMediaArray.get(i);
+                    Log.d(TAG, "onCreate: path" + path);
+                    if(path.equals(enterPath)) {
+                        mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(mSelectSet, mSelectedMediaArray, i);
+                        break;
+                    }
+                }
+            } else {
+                mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(mSelectSet, mSelectedMediaArray, -1);
+            }
+        }
+        mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
+    }
 
     @Override
     public void onClickItem(View v) {
@@ -101,25 +127,34 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
     private void initialization() {
         MAX_HEIGHT = 0;
         mMediaPathArray = new SparseArrayCompat<>();
+        mSelectedMediaArray = new SparseArrayCompat<>();
         mMediaManager = new MediaManager();
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mLinearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mRvPreviewThumbnail.setLayoutManager(mLinearLayoutManager);
+
         Intent intent = getIntent();
         mSelectSet = (HashSet) intent.getBundleExtra(SELECTED_SET).get(SELECTED_SET);
         isOriginMedia = intent.getBooleanExtra(IS_ORIGIN_MEDIA, false);
         mCurrentPosition = intent.getIntExtra(CURRENT_POSOTION, 0);
         String fileName = intent.getStringExtra(FILE_NAME);
-        if(fileName == null) {
-            int position = 0;
-            if(mSelectSet.size() != 0) {
-                for(String path: mSelectSet) {
-                    mMediaPathArray.put(position, path);
-                    ++position;
-                }
+
+        int position = 0;
+        if(mSelectSet.size() != 0) {
+            Iterator<String> iterator = mSelectSet.iterator();
+            while(iterator.hasNext()) {
+                mSelectedMediaArray.put(position, iterator.next());
+                ++position;
             }
+        }
+
+        if(fileName == null) {
+            mMediaPathArray = mSelectedMediaArray.clone();
         } else if(! fileName.equals("所有图片")) {
             mMediaPathArray = mMediaManager.findMediaByFileName(fileName);
         } else {
             List<Media> mediaList = mMediaManager.findAllMedia();
-            int position = 0;
+            position = 0;
             for (Media media : mediaList) {
                 mMediaPathArray.put(position, media.getUrl());
                 ++position;
@@ -147,6 +182,8 @@ public class PreviewActivity extends AppCompatActivity implements PreViewViewPag
         if(isOriginMedia) {
             mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
         }
+
+
     }
 
     /**
