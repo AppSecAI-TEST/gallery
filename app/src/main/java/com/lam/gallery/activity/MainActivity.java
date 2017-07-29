@@ -29,7 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaGridAdapter.onClickToIntent {
     private static final String TAG = "MainActivity";
     @BindView(R.id.iv_title_left_point)
     ImageView mIvTitleLeftPoint;
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MediaGridAdapter mMediaGridAdapter;
     private FilesListAdapter mFilesListAdapter;
     private boolean isOriginMedia;
+    private int mSelectedFilePos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //RecyclerView相关
         mMediaGridAdapter = new MediaGridAdapter(mMediaPathArray, mBtTitleSend, mTvFooterPreview);
+        mMediaGridAdapter.setOnClickToIntent(this);
         mRvGalleryGrid.setLayoutManager(mGridLayoutManager);
         mRvGalleryGrid.setAdapter(mMediaGridAdapter);
 
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFilesListAdapter.setOnFileListItemClickListener(new FilesListAdapter.OnFileListItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                mSelectedFilePos = position;
                 if(position == 0) {
                     mMediaGridAdapter.setMediaPathArray(mMediaPathArray);
                     //mMediaGridAdapter = new MediaGridAdapter(mMediaPathArray, mBtTitleSend, mTvFooterPreview);
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTvFooterFileName.setOnClickListener(this);
         mIvFooterFileName.setOnClickListener(this);
         mViewFileListBackground.setOnClickListener(this);
+        mTvFooterPreview.setOnClickListener(this);
     }
 
     /**
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.mFileCoverArray = new SparseArrayCompat<>();
         this.mSelectFilePictureArray = new SparseArrayCompat<>();
         this.mMediaManager = new MediaManager();
+        this.isOriginMedia = false;
     }
 
     /**
@@ -164,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_footer_origin:
-                if (isOriginMedia) {
+                if (! isOriginMedia) {
                     mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
                 } else {
                     mIvFooterOrigin.setImageResource(R.drawable.footer_circle_16);
@@ -172,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isOriginMedia = !isOriginMedia;
                 break;
             case R.id.tv_footer_origin:
-                if (isOriginMedia) {
+                if (! isOriginMedia) {
                     mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
                 } else {
                     mIvFooterOrigin.setImageResource(R.drawable.footer_circle_16);
@@ -193,6 +198,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.view_file_list_background:
                 if (mRlFileItem.getVisibility() != View.GONE) {
                     fileListAnimator();
+                }
+                break;
+            case R.id.tv_footer_preview:
+                if(mMediaGridAdapter.getSelectSet().size() != 0) {
+                    PreviewActivity.start(this, mMediaGridAdapter.getSelectSet(), null, isOriginMedia, -1);
                 }
                 break;
         }
@@ -219,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mViewFileListBackground.startAnimation(alphaAnimation);
         }
         fileListAnimator.setDuration(300);
+        fileBackAnimator.setDuration(300);
         fileListAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -275,5 +286,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFilesListAdapter.setFilesCountArray(mFilesCountArray);
         mFilesListAdapter.setAllMediaCount(mMediaPathArray.size());
         mFilesListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void clickToIntent(int position) {
+        String fileName = mFilesNameArray.get(mSelectedFilePos);
+        if(fileName == null) {
+            fileName = "所有图片";
+        }
+        PreviewActivity.start(this, mMediaGridAdapter.getSelectSet(), fileName, isOriginMedia, position);
     }
 }

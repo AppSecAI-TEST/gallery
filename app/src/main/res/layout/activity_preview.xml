@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lam.gallery.activity.PreviewActivity">
+
+    <com.lam.gallery.ui.PreViewViewPager
+        android:id="@+id/vp_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#1b1b1b">
+
+    </com.lam.gallery.ui.PreViewViewPager>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/rl_preview_header"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:id="@+id/iv_header_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/back_32"
+                android:paddingLeft="10dp"
+                android:layout_centerVertical="true"/>
+
+            <View
+                android:id="@+id/view_header_line"
+                android:layout_width="1dp"
+                android:layout_height="32dp"
+                android:background="#cb1a1a1a"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/iv_header_back"
+                android:layout_margin="10dp" />
+
+            <TextView
+                android:id="@+id/tv_preview_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                android:text="所有图片"
+                android:textStyle="bold"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:textSize="20sp"
+                android:layout_toRightOf="@+id/view_header_line"/>
+
+            <Button
+                android:id="@+id/bt_header_send"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="发送"
+                android:textColor="#a1a1a1"
+                android:textSize="15sp"
+                android:background="#094909"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"/>
+
+        </RelativeLayout>
+
+        <!--maxHeight = 100dp-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_preview_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="#e5292b29"
+            android:layout_above="@+id/rl_preview_footer">
+
+        </android.support.v7.widget.RecyclerView>
+
+
+        <RelativeLayout
+            android:id="@+id/rl_preview_footer"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#e4292b29"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:id="@+id/tv_footer_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="编辑"
+                android:textColor="#fff"
+                android:textSize="18sp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_marginLeft="10dp"
+                android:layout_centerVertical="true"/>
+
+
+            <ImageView
+                android:id="@+id/iv_footer_origin"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/footer_circle_16"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:paddingRight="35dp"/>
+
+            <TextView
+                android:id="@+id/tv_footer_origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="原图"
+                android:textColor="#fff"
+                android:textSize="18sp"
+                android:paddingLeft="35dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
+
+            <ImageView
+                android:id="@+id/iv_footer_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/select_alpha_16"
+                android:layout_toLeftOf="@+id/tv_footer_select"
+                android:layout_centerVertical="true"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:paddingRight="10dp"/>
+
+            <TextView
+                android:id="@+id/tv_footer_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="15dp"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

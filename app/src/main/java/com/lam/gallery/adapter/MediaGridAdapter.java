@@ -26,19 +26,24 @@ import java.util.HashSet;
  * Created by lenovo on 2017/7/28.
  */
 
-public class MediaGridAdapter extends RecyclerView.Adapter{
+public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewImageItem.OnIntentToPreviewListener{
     private static final String TAG = "MediaGridAdapter";
     private Context mContext;
     private HashSet<String> mSelectSet;
     private SparseArrayCompat<String> mMediaPathArray;
     private Button mBtSend;
     private TextView mTvPreview;
+    private static onClickToIntent sOnClickToIntent;
 
     public MediaGridAdapter(SparseArrayCompat<String> mediaPathArray, Button btSend, TextView tvPreview) {
         mMediaPathArray = mediaPathArray;
         mSelectSet = new HashSet<>();
         mBtSend = btSend;
         mTvPreview = tvPreview;
+    }
+
+    public static void setOnClickToIntent(onClickToIntent onClickToIntent) {
+        sOnClickToIntent = onClickToIntent;
     }
 
     public void setMediaPathArray(SparseArrayCompat<String> mediaPathArray) {
@@ -54,6 +59,8 @@ public class MediaGridAdapter extends RecyclerView.Adapter{
         mContext = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid, null);
         GridViewHolder gridViewHolder = new GridViewHolder(view);
+        GridViewImageItem gridViewImageItem = (GridViewImageItem) view.findViewById(R.id.gvi_media_image);
+        gridViewImageItem.setOnIntentToPreviewListener(this);
         return gridViewHolder;
     }
 
@@ -63,6 +70,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter{
         final GridViewImageItem gridViewImageItem = ((GridViewHolder) holder).getGridViewImageItem();
         //初始化类
         gridViewImageItem.setImageResource(R.drawable.loading);
+        gridViewImageItem.setTag(position);
         if(! mSelectSet.contains(mMediaPathArray.get(position))) {
             selectImage.setImageResource(R.drawable.select_alpha_16);
             gridViewImageItem.clearColorFilter();
@@ -149,5 +157,16 @@ public class MediaGridAdapter extends RecyclerView.Adapter{
         public ImageView getImageView() {
             return mImageView;
         }
+    }
+
+    @Override
+    public void onClickToIntent(View v) {
+        if(sOnClickToIntent != null) {
+            sOnClickToIntent.clickToIntent((int)v.getTag());
+        }
+    }
+
+    public interface onClickToIntent {
+        void clickToIntent(int position);
     }
 }
