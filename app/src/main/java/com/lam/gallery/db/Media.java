@@ -1,10 +1,13 @@
 package com.lam.gallery.db;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by lenovo on 2017/7/27.
  */
 
-public class Media {
+public class Media implements Parcelable {
     private String imageName;
 
     private String url;
@@ -50,5 +53,39 @@ public class Media {
 
     public void setStoreDate(String storeDate) {
         this.storeDate = storeDate;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(imageName);
+        dest.writeString(url);
+        dest.writeString(fileName);
+        dest.writeString(storeDate);
+    }
+
+    //将Parcel容器中的数据转换成对象数据
+    public static final Parcelable.Creator<Media> CREATOR = new Creator<Media>() {
+        @Override
+        public Media createFromParcel(Parcel source) {
+            return new Media(source);
+        }
+
+        @Override
+        public Media[] newArray(int size) {
+            return new Media[size];
+        }
+    };
+
+    public Media(Parcel in) {
+        imageName = in.readString();
+        url = in.readString();
+        fileName = in.readString();
+        storeDate = in.readString();
     }
 }

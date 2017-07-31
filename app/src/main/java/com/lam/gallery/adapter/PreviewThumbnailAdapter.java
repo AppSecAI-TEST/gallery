@@ -1,8 +1,8 @@
 package com.lam.gallery.adapter;
 
 import android.graphics.Bitmap;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +20,9 @@ import java.util.HashSet;
  * Created by lenovo on 2017/7/29.
  */
 
-//需要外调接口给previewActivity处理点击时viewPager大图也变化的事件
 public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements View.OnClickListener {
     private HashSet<String> mSelectSet;
-    private SparseArrayCompat<String> mMediaPathArray;
+    private SparseArray<String> mMediaPathArray;
     private int mSelectPos;
     private static OnSelectThumbnail sOnSelectThumbnail;
 
@@ -31,12 +30,15 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         sOnSelectThumbnail = onSelectThumbnail;
     }
 
-    public PreviewThumbnailAdapter(HashSet<String> selectSet, SparseArrayCompat<String> mediaPathArray, int selectPos) {
+    public PreviewThumbnailAdapter(HashSet<String> selectSet, SparseArray<String> mediaPathArray, int selectPos) {
         mSelectSet = selectSet;
         mMediaPathArray = mediaPathArray;
         mSelectPos = selectPos;
     }
 
+    public void setMediaPathArray(SparseArray<String> mediaPathArray) {
+        mMediaPathArray = mediaPathArray;
+    }
 
     public void setSelectPos(int selectPos) {
         mSelectPos = selectPos;
@@ -68,7 +70,7 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
             MediaTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 80);
+                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 60);
                     LruCacheManager.addBitmapToCache(mMediaPathArray.get(position), bitmap);
                     thumbnailImage.post(new Runnable() {
                         @Override

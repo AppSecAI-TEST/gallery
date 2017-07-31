@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +26,16 @@ import java.util.HashSet;
  * Created by lenovo on 2017/7/28.
  */
 
-public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewImageItem.OnIntentToPreviewListener{
+public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewImageItem.OnIntentToPreviewListener {
     private static final String TAG = "MediaGridAdapter";
     private Context mContext;
     private HashSet<String> mSelectSet;
-    private SparseArrayCompat<String> mMediaPathArray;
+    private SparseArray<String> mMediaPathArray;
     private Button mBtSend;
     private TextView mTvPreview;
     private static onClickToIntent sOnClickToIntent;
 
-    public MediaGridAdapter(SparseArrayCompat<String> mediaPathArray, Button btSend, TextView tvPreview) {
+    public MediaGridAdapter(SparseArray<String> mediaPathArray, Button btSend, TextView tvPreview) {
         mMediaPathArray = mediaPathArray;
         mSelectSet = new HashSet<>();
         mBtSend = btSend;
@@ -46,12 +46,16 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         sOnClickToIntent = onClickToIntent;
     }
 
-    public void setMediaPathArray(SparseArrayCompat<String> mediaPathArray) {
+    public void setMediaPathArray(SparseArray<String> mediaPathArray) {
         mMediaPathArray = mediaPathArray;
     }
 
     public HashSet<String> getSelectSet() {
         return mSelectSet;
+    }
+
+    public void setSelectSet(HashSet<String> selectSet) {
+        mSelectSet = selectSet;
     }
 
     @Override
@@ -79,13 +83,13 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
             gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
         gridViewImageItem.setTag(position);
-        
+        //加载图片
         Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaPathArray.get(position));
         if(bitmap == null) {
             MediaTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 100);
+                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 80);
                     LruCacheManager.addBitmapToCache(mMediaPathArray.get(position), bitmap);
                     gridViewImageItem.post(new Runnable() {
                         @Override

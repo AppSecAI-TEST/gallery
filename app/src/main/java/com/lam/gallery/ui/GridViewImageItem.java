@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,6 +15,7 @@ import com.lam.gallery.R;
  */
 
 public class GridViewImageItem extends android.support.v7.widget.AppCompatImageView {
+    private static final String TAG = "GridViewImageItem";
 
     private int mSelectLength;
     private int mViewLength;
@@ -41,6 +43,7 @@ public class GridViewImageItem extends android.support.v7.widget.AppCompatImageV
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                Log.d(TAG, "onTouchEvent: ");
                 isMove = false;
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -60,4 +63,5 @@ public class GridViewImageItem extends android.support.v7.widget.AppCompatImageV
     public interface OnIntentToPreviewListener {
         void onClickToIntent(View v);
     }
+
 }

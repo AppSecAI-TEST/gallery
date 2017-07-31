@@ -6,13 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.lam.gallery.activity.PreviewActivity">
 
-    <com.lam.gallery.ui.PreViewViewPager
+    <android.support.v4.view.ViewPager
         android:id="@+id/vp_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:background="#1b1b1b">
 
-    </com.lam.gallery.ui.PreViewViewPager>
+    </android.support.v4.view.ViewPager>
 
     <RelativeLayout
         android:layout_width="match_parent"

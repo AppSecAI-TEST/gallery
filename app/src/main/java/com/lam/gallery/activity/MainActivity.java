@@ -1,13 +1,16 @@
 package com.lam.gallery.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -16,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.lam.gallery.Animation.ValueAnimatorManager;
 import com.lam.gallery.R;
 import com.lam.gallery.Task.MediaTask;
 import com.lam.gallery.adapter.FilesListAdapter;
@@ -61,14 +65,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RelativeLayout mRlFileItem;
 
 
-    private SparseArrayCompat<String> mFileNameArray;
-    private SparseArrayCompat<String> mMediaNameArray;
-    private SparseArrayCompat<String> mMediaPathArray;
-    private SparseArrayCompat<String> mMediaStoreDateArray;
-    private SparseArrayCompat<String> mFilesNameArray;
-    private SparseArrayCompat<String> mFilesCountArray;
-    private SparseArrayCompat<String> mFileCoverArray;
-    private SparseArrayCompat<String> mSelectFilePictureArray;
+    private SparseArray<String> mFileNameArray;
+    private SparseArray<String> mMediaNameArray;
+    private SparseArray<String> mMediaPathArray;
+    private SparseArray<String> mMediaStoreDateArray;
+    private SparseArray<String> mFilesNameArray;
+    private SparseArray<String> mFilesCountArray;
+    private SparseArray<String> mFileCoverArray;
+    private SparseArray<String> mSelectFilePictureArray;
     private GridLayoutManager mGridLayoutManager;
     private LinearLayoutManager mLinearLayoutManager;
     private MediaManager mMediaManager;
@@ -77,6 +81,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isOriginMedia;
     private int mSelectedFilePos;
 
+    public static final String IS_ORIGIN_MEDIA = "is origin media";
+    public static final String SELECTED_SET = "selected set";
+
+    public static void start(Context context, boolean isOriginMedia, HashSet<String> selectSet) {
+        Intent starter = new Intent(context, MainActivity.class);
+        starter.putExtra(IS_ORIGIN_MEDIA, isOriginMedia);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(SELECTED_SET, selectSet);
+        starter.putExtra(SELECTED_SET, bundle);
+        context.startActivity(starter);
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,11 +116,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mSelectedFilePos = position;
                 if(position == 0) {
                     mMediaGridAdapter.setMediaPathArray(mMediaPathArray);
-                    //mMediaGridAdapter = new MediaGridAdapter(mMediaPathArray, mBtTitleSend, mTvFooterPreview);
                 } else {
                     mSelectFilePictureArray = mMediaManager.findMediaByFileName(mFilesNameArray.get(position));
                     Log.d(TAG, "onItemClick: " + mSelectFilePictureArray.size());
-//                    mMediaGridAdapter = new MediaGridAdapter(mSelectFilePictureArray, mBtTitleSend, mTvFooterPreview);
                     mMediaGridAdapter.setMediaPathArray(mSelectFilePictureArray);
                 }
                 mRvGalleryGrid.setLayoutManager(mGridLayoutManager);
@@ -123,20 +137,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTvFooterPreview.setOnClickListener(this);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "onNewIntent: ");
+        setIntent(intent);
+        if(intent.getBundleExtra(SELECTED_SET) != null) {
+            HashSet<String> selectSet = (HashSet) intent.getBundleExtra(SELECTED_SET).get(SELECTED_SET);
+            isOriginMedia = intent.getBooleanExtra(IS_ORIGIN_MEDIA, false);
+            //更新UI
+            mMediaGridAdapter.setSelectSet(selectSet);
+            mMediaGridAdapter.notifyDataSetChanged();
+            if(isOriginMedia) {
+                mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
+            } else {
+                mIvFooterOrigin.setImageResource(R.drawable.footer_circle_16);
+            }
+            if(selectSet.size() == 0 ) {
+                mBtTitleSend.setBackgroundColor(0xFF094909);
+                mBtTitleSend.setText("发送");
+                mBtTitleSend.setTextColor(0xFFA1A1A1);
+                mTvFooterPreview.setText("预览");
+                mTvFooterPreview.setTextColor(0xFF5B5B5B);
+            } else {
+                mBtTitleSend.setBackgroundColor(0xFF19C917);
+                mBtTitleSend.setText("发送(" + selectSet.size() + "/9)");
+                mBtTitleSend.setTextColor(Color.WHITE);
+                mTvFooterPreview.setText("预览(" + selectSet.size() + ")");
+                mTvFooterPreview.setTextColor(Color.WHITE);
+            }
+        }
+    }
+
     /**
      * 成员变量等初始化工作
      */
     private void initialization() {
-        this.mFileNameArray = new SparseArrayCompat<>();
-        this.mMediaNameArray = new SparseArrayCompat<>();
-        this.mMediaPathArray = new SparseArrayCompat<>();
-        this.mMediaStoreDateArray = new SparseArrayCompat<>();
+        this.mFileNameArray = new SparseArray<>();
+        this.mMediaNameArray = new SparseArray<>();
+        this.mMediaPathArray = new SparseArray<>();
+        this.mMediaStoreDateArray = new SparseArray<>();
         this.mGridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
         this.mLinearLayoutManager = new LinearLayoutManager(MainActivity.this);
-        this.mFilesNameArray = new SparseArrayCompat<>();
-        this.mFilesCountArray = new SparseArrayCompat<>();
-        this.mFileCoverArray = new SparseArrayCompat<>();
-        this.mSelectFilePictureArray = new SparseArrayCompat<>();
+        this.mFilesNameArray = new SparseArray<>();
+        this.mFilesCountArray = new SparseArray<>();
+        this.mFileCoverArray = new SparseArray<>();
+        this.mSelectFilePictureArray = new SparseArray<>();
         this.mMediaManager = new MediaManager();
         this.isOriginMedia = false;
     }
@@ -215,42 +260,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mRvFileList.setVisibility(View.VISIBLE);
         mViewFileListBackground.setVisibility(View.VISIBLE);
         int maxHeight = mRvGalleryGrid.getHeight() - mRlGalleryFooter.getHeight();
-        final ValueAnimator fileListAnimator;
-        final ValueAnimator fileBackAnimator;
+
+        ValueAnimator fileListAnimator;
+        ValueAnimator fileBackAnimator;
         if (mRvFileList.getHeight() == 0) {
-            fileListAnimator = ValueAnimator.ofInt(0, maxHeight);
-            fileBackAnimator = ValueAnimator.ofInt(0, maxHeight);
+            fileListAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mRvFileList);
+            fileBackAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mViewFileListBackground);
             Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_alpha_to_translucent);
             mViewFileListBackground.startAnimation(alphaAnimation);
         } else {
-            fileListAnimator = ValueAnimator.ofInt(mRvFileList.getLayoutParams().height, 0);
-            fileBackAnimator = ValueAnimator.ofInt(mViewFileListBackground.getLayoutParams().height, 0);
+            fileListAnimator = ValueAnimatorManager.viewAnimator(mRvFileList.getLayoutParams().height, 0, 300, mRvFileList);
+            fileBackAnimator = ValueAnimatorManager.viewAnimator(mViewFileListBackground.getLayoutParams().height, 0, 300, mViewFileListBackground);
             Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_translucent_to_alpha);
             mViewFileListBackground.startAnimation(alphaAnimation);
         }
-        fileListAnimator.setDuration(300);
-        fileBackAnimator.setDuration(300);
-        fileListAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mRvFileList.getLayoutParams().height = (int) animation.getAnimatedValue();
-                mRvFileList.setLayoutParams(mRvFileList.getLayoutParams());
-            }
-        });
-        fileBackAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mViewFileListBackground.getLayoutParams().height = (int) animation.getAnimatedValue();
-                mViewFileListBackground.setLayoutParams(mViewFileListBackground.getLayoutParams());
-            }
-        });
         fileListAnimator.start();
         fileBackAnimator.start();
     }
 
-    /**
-     *
-     */
     private void initFileListData() {
         mFilesNameArray.clear();
         mFileCoverArray.clear();

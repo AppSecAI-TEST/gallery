@@ -2,9 +2,9 @@ package com.lam.gallery.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +22,16 @@ import com.lam.gallery.manager.LruCacheManager;
 
 public class FilesListAdapter extends RecyclerView.Adapter implements View.OnClickListener{
     private static final String TAG = "FilesListAdapter";
-    private SparseArrayCompat<String> mFilesNameArray;
-    private SparseArrayCompat<String> mFilesCountArray;
-    private SparseArrayCompat<String> mFileCoverArray;
+    private SparseArray<String> mFilesNameArray;
+    private SparseArray<String> mFilesCountArray;
+    private SparseArray<String> mFileCoverArray;
 //    private SparseArrayCompat<String> mSelectFilePictureArray;
     private Context mContext;
     private int mAllMediaCount;
     private OnFileListItemClickListener mOnFileListItemClickListener = null;
     private int mFileSelectPosition = 0;
 
-    public FilesListAdapter(SparseArrayCompat<String> filesNameArray, SparseArrayCompat<String> filesCountArray, SparseArrayCompat<String> fileCoverArray, int allMediaCount) {
+    public FilesListAdapter(SparseArray<String> filesNameArray, SparseArray<String> filesCountArray, SparseArray<String> fileCoverArray, int allMediaCount) {
         mFilesNameArray = filesNameArray;
         mFilesCountArray = filesCountArray;
         mFileCoverArray = fileCoverArray;
@@ -39,15 +39,15 @@ public class FilesListAdapter extends RecyclerView.Adapter implements View.OnCli
         mAllMediaCount = allMediaCount;
     }
 
-    public void setFilesNameArray(SparseArrayCompat<String> filesNameArray) {
+    public void setFilesNameArray(SparseArray<String> filesNameArray) {
         mFilesNameArray = filesNameArray;
     }
 
-    public void setFilesCountArray(SparseArrayCompat<String> filesCountArray) {
+    public void setFilesCountArray(SparseArray<String> filesCountArray) {
         mFilesCountArray = filesCountArray;
     }
 
-    public void setFileCoverArray(SparseArrayCompat<String> fileCoverArray) {
+    public void setFileCoverArray(SparseArray<String> fileCoverArray) {
         mFileCoverArray = fileCoverArray;
     }
 

@@ -2,8 +2,8 @@ package com.lam.gallery.db;
 
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.lam.gallery.GalleryApplication;
 
@@ -37,9 +37,9 @@ public class MediaManager {
         return mediaList;
     }
 
-    public SparseArrayCompat<String> findMediaByFileName(String fileName) {
+    public SparseArray<String> findMediaByFileName(String fileName) {
 //        List<Media> mediaList = new ArrayList<>();
-        SparseArrayCompat<String> selectFilePictureArray = new SparseArrayCompat<>();
+        SparseArray<String> selectFilePictureArray = new SparseArray<>();
         int pos = 0;
         Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, "bucket_display_name = ?", new String[] {fileName}, "date_added desc");
         while(cursor.moveToNext()) {
