@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.rl_file_item)
     RelativeLayout mRlFileItem;
 
-
     private SparseArray<String> mFileNameArray;
     private SparseArray<String> mMediaNameArray;
     private SparseArray<String> mMediaPathArray;
