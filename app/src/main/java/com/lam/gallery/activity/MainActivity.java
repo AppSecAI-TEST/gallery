@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         if(v.getId() == R.id.iv_footer_file_name || v.getId() == R.id.tv_footer_file_name || v.getId() == R.id.view_file_list_background)
             fileListAnimator();
         if(v.getId() == R.id.tv_footer_preview && SelectedMedia.selectedMediaCount() != 0)
-            PreViewActivity.start(this, -1, null);
+            PreviewActivity.start(this, -1, null);
     }
 
     /**
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     @Override
     public void clickToIntent(int position) {
         Log.d(TAG, "clickToIntent: ");
-        PreViewActivity.start(this, position, mMediaFileList.get(mSelectedFilePos).getFileName());
+        PreviewActivity.start(this, position, mMediaFileList.get(mSelectedFilePos).getFileName());
     }
 
     @Override

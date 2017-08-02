@@ -34,7 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreViewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
+public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
     private static final String TAG = "PreViewActivity";
     @BindView(R.id.vp_preview)
     ViewPager mVpPreview;
@@ -78,7 +78,7 @@ public class PreViewActivity extends AppCompatActivity implements View.OnClickLi
     public static final String PREVIEW_MEDIA_FILE_NAME = "need to preview media's file name";
 
     public static void start(Context context, int clickEnterPos, String previewMediaFileName) {
-        Intent starter = new Intent(context, PreViewActivity.class);
+        Intent starter = new Intent(context, PreviewActivity.class);
         starter.putExtra(CLICK_POS, clickEnterPos);
         starter.putExtra(PREVIEW_MEDIA_FILE_NAME, previewMediaFileName);
         context.startActivity(starter);
@@ -155,7 +155,7 @@ public class PreViewActivity extends AppCompatActivity implements View.OnClickLi
             mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
         }
         mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
-        mPreviewThumbnailAdapter.setOnThumbnailItemClickListener(PreViewActivity.this);
+        mPreviewThumbnailAdapter.setOnThumbnailItemClickListener(PreviewActivity.this);
 
     }
 
@@ -277,6 +277,7 @@ public class PreViewActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void updateAddSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
+        mIvFooterSelect.setImageResource(R.drawable.select_green_16);
         mPreviewThumbnailAdapter.setCurrentPos(SelectedMedia.selectedMediaCount() - 1);
         mPreviewThumbnailAdapter.notifyDataSetChanged();
         mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, SelectedMedia.selectedMediaCount() - 1);
@@ -286,6 +287,7 @@ public class PreViewActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void updateRemoveSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
+        mIvFooterSelect.setImageResource(R.drawable.select_alpha_16);
         mPreviewThumbnailAdapter.setCurrentPos(-1);
         mPreviewThumbnailAdapter.notifyDataSetChanged();
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
