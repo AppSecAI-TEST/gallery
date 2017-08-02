@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.lam.gallery.ui.SquareImageView
-            android:id="@+id/siv_thumbnail"
+        <ImageView
+            android:id="@+id/iv_thumbnail"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_gravity="center"

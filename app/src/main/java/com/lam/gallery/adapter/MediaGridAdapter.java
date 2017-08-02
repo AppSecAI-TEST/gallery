@@ -1,141 +1,115 @@
 package com.lam.gallery.adapter;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lam.gallery.R;
-import com.lam.gallery.Task.MediaTask;
-import com.lam.gallery.manager.BitmapManager;
+import com.lam.gallery.Task.ThreadTask;
+import com.lam.gallery.db.Media;
+import com.lam.gallery.manager.MediaManager;
+import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.LruCacheManager;
 import com.lam.gallery.ui.GridViewImageItem;
 
-import java.util.HashSet;
+import java.util.List;
 
 /**
- * Created by lenovo on 2017/7/28.
+ * Created by lenovo on 2017/8/1.
  */
 
-public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewImageItem.OnIntentToPreviewListener {
+public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewImageItem.OnIntentToPreviewListener{
     private static final String TAG = "MediaGridAdapter";
-    private Context mContext;
-    private HashSet<String> mSelectSet;
-    private SparseArray<String> mMediaPathArray;
-    private Button mBtSend;
-    private TextView mTvPreview;
+
+    private List<Media> mMediaList;
+    private Handler mHandler;
     private static onClickToIntent sOnClickToIntent;
 
-    public MediaGridAdapter(SparseArray<String> mediaPathArray, Button btSend, TextView tvPreview) {
-        mMediaPathArray = mediaPathArray;
-        mSelectSet = new HashSet<>();
-        mBtSend = btSend;
-        mTvPreview = tvPreview;
+    public MediaGridAdapter(List<Media> mediaList) {
+        mMediaList = mediaList;
+        mHandler = new Handler(Looper.getMainLooper());
+    }
+
+    public void setMediaList(List<Media> mediaList) {
+        mMediaList = mediaList;
     }
 
     public static void setOnClickToIntent(onClickToIntent onClickToIntent) {
         sOnClickToIntent = onClickToIntent;
     }
 
-    public void setMediaPathArray(SparseArray<String> mediaPathArray) {
-        mMediaPathArray = mediaPathArray;
-    }
-
-    public HashSet<String> getSelectSet() {
-        return mSelectSet;
-    }
-
-    public void setSelectSet(HashSet<String> selectSet) {
-        mSelectSet = selectSet;
-    }
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid, null);
         GridViewHolder gridViewHolder = new GridViewHolder(view);
-        GridViewImageItem gridViewImageItem = (GridViewImageItem) view.findViewById(R.id.gvi_media_image);
-        gridViewImageItem.setOnIntentToPreviewListener(this);
+        gridViewHolder.getGridViewImageItem().setOnIntentToPreviewListener(this);
         return gridViewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        Log.d(TAG, "onBindViewHolder: ");
         final ImageView selectImage = ((GridViewHolder) holder).getImageView();
         final GridViewImageItem gridViewImageItem = ((GridViewHolder) holder).getGridViewImageItem();
-        //初始化类
+        //初始化
         gridViewImageItem.setImageResource(R.drawable.loading);
+        selectImage.setImageResource(R.drawable.select_alpha_16);
+        //设置标记setTag类
         gridViewImageItem.setTag(position);
-        if(! mSelectSet.contains(mMediaPathArray.get(position))) {
-            selectImage.setImageResource(R.drawable.select_alpha_16);
-            gridViewImageItem.clearColorFilter();
-        } else {
-            selectImage.setImageResource(R.drawable.select_green_16);
-            gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-        }
-        gridViewImageItem.setTag(position);
-        //加载图片
-        Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaPathArray.get(position));
-        if(bitmap == null) {
-            MediaTask.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaPathArray.get(position), 80);
-                    LruCacheManager.addBitmapToCache(mMediaPathArray.get(position), bitmap);
-                    gridViewImageItem.post(new Runnable() {
+        selectImage.setTag(position);
+        //加载渲染ui
+        ThreadTask.addTask(new Runnable() {
+            @Override
+            public void run() {
+                String path = mMediaList.get(position).getPath();
+                if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
+                    mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if((int)gridViewImageItem.getTag() == position) {
-                                gridViewImageItem.setImageBitmap(bitmap);
-                            }
+                            selectImage.setImageResource(R.drawable.select_green_16);
+                            gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
                         }
                     });
                 }
-            });
-        } else {
-            gridViewImageItem.setImageBitmap(bitmap);
-        }
+                Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
+                if(bitmap == null) {
+                    bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
+                    LruCacheManager.addBitmapToCache(path, bitmap);
+                }
+                final Bitmap correctBitmap = bitmap;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if((int)gridViewImageItem.getTag() == position) {
+                            gridViewImageItem.setImageBitmap(correctBitmap);
+                        }
+                    }
+                });
+            }
+        });
 
-
-        //设置内部监听
-        ((GridViewHolder) holder).getImageView().setOnClickListener(new View.OnClickListener() {
+        selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(! mSelectSet.contains(mMediaPathArray.get(position))) {
-                    if(mSelectSet.size() == 9) {
-                        Toast.makeText(mContext, "你最多只能选择9张图片", Toast.LENGTH_SHORT).show();
-                    } else {
-                        selectImage.setImageResource(R.drawable.select_green_16);
-                        gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-                        mSelectSet.add(mMediaPathArray.get(position));
-                    }
-                } else {
+                String path = mMediaList.get((int) v.getTag()).getPath();
+                Media selectMedia = mMediaList.get((int) v.getTag());
+                if(SelectedMedia.getSelectedPosition(path) != -1) { //该图片在已选集合中
+                    SelectedMedia.removeByPath(path);
                     selectImage.setImageResource(R.drawable.select_alpha_16);
                     gridViewImageItem.clearColorFilter();
-                    mSelectSet.remove(mMediaPathArray.get(position));
-                }
-                int selectCount = mSelectSet.size();
-                if(selectCount != 0) {
-                    mBtSend.setBackgroundColor(0xFF19C917);
-                    mBtSend.setText("发送(" + selectCount + "/9)");
-                    mBtSend.setTextColor(Color.WHITE);
-                    mTvPreview.setText("预览(" + selectCount + ")");
-                    mTvPreview.setTextColor(Color.WHITE);
                 } else {
-                    mBtSend.setBackgroundColor(0xFF094909);
-                    mBtSend.setText("发送");
-                    mBtSend.setTextColor(0xFFA1A1A1);
-                    mTvPreview.setText("预览");
-                    mTvPreview.setTextColor(0xFF5B5B5B);
+                    if(SelectedMedia.addSelected(selectMedia)) {
+                        selectImage.setImageResource(R.drawable.select_green_16);
+                        gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    }
                 }
             }
         });
@@ -143,7 +117,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
 
     @Override
     public int getItemCount() {
-        return mMediaPathArray == null ? 0 : mMediaPathArray.size();
+        return mMediaList == null ? 0 : mMediaList.size();
     }
 
     public class GridViewHolder extends RecyclerView.ViewHolder {
@@ -163,14 +137,15 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         }
     }
 
+
+    public interface onClickToIntent {
+        void clickToIntent(int position);
+    }
+
     @Override
     public void onClickToIntent(View v) {
         if(sOnClickToIntent != null) {
             sOnClickToIntent.clickToIntent((int)v.getTag());
         }
-    }
-
-    public interface onClickToIntent {
-        void clickToIntent(int position);
     }
 }

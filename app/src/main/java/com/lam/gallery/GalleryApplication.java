@@ -3,9 +3,6 @@ package com.lam.gallery;
 import android.app.Application;
 import android.content.Context;
 
-/**
- * Created by lenovo on 2017/7/27.
- */
 
 public class GalleryApplication extends Application {
 

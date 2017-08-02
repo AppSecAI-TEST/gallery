@@ -10,9 +10,6 @@ import android.view.View;
 
 import com.lam.gallery.R;
 
-/**
- * Created by lenovo on 2017/7/28.
- */
 
 public class GridViewImageItem extends android.support.v7.widget.AppCompatImageView {
     private static final String TAG = "GridViewImageItem";

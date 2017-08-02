@@ -3,14 +3,12 @@ package com.lam.gallery.activity;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -18,36 +16,36 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.lam.gallery.Animation.ValueAnimatorManager;
 import com.lam.gallery.R;
+import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.adapter.PreviewThumbnailAdapter;
 import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.db.MediaManager;
+import com.lam.gallery.db.SelectedMedia;
+import com.lam.gallery.manager.MediaManager;
+import com.lam.gallery.manager.ValueAnimatorManager;
+import com.lam.gallery.ui.ToastUtil;
+import com.lam.gallery.ui.UiManager;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewActivity extends AppCompatActivity implements PreviewThumbnailAdapter.OnSelectThumbnail, View.OnClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, PreviewViewpagerAdapter.OnClickSelect {
-    private static final String TAG = "PreviewActivity";
+public class PreViewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
+    private static final String TAG = "PreViewActivity";
     @BindView(R.id.vp_preview)
     ViewPager mVpPreview;
-    @BindView(R.id.iv_header_back)
-    ImageView mIvHeaderBack;
-    @BindView(R.id.view_header_line)
-    View mViewHeaderLine;
-    @BindView(R.id.tv_preview_title)
-    TextView mTvPreviewTitle;
-    @BindView(R.id.bt_header_send)
-    Button mBtHeaderSend;
-    @BindView(R.id.rl_preview_header)
-    RelativeLayout mRlPreviewHeader;
+    @BindView(R.id.iv_title_left_point)
+    ImageView mIvTitleLeftPoint;
+    @BindView(R.id.view_title_line)
+    View mViewTitleLine;
+    @BindView(R.id.bt_title_send)
+    Button mBtTitleSend;
+    @BindView(R.id.gallery_title)
+    RelativeLayout mGalleryTitle;
     @BindView(R.id.rv_preview_thumbnail)
     RecyclerView mRvPreviewThumbnail;
     @BindView(R.id.tv_footer_edit)
@@ -62,221 +60,113 @@ public class PreviewActivity extends AppCompatActivity implements PreviewThumbna
     TextView mTvFooterSelect;
     @BindView(R.id.rl_preview_footer)
     RelativeLayout mRlPreviewFooter;
+    @BindView(R.id.tv_header_title)
+    TextView mTvHeaderTitle;
 
-    public static final String SELECTED_SET = "selected set";
-    public static final String FILE_NAME = "file name";
-    public static final String IS_ORIGIN_MEDIA = "is origin media";
-    public static final String CURRENT_POSITION = "current position";
-    public static final int INTENT_BY_PREVIEW = 1;
-    public static final int INTENT_BY_SELECTED = 2;
-    public static final int INTENT_BY_UNSELECTED = 3;
-
-    private HashSet<String> mSelectSet;
-    private SparseArray<String> mMediaPathArray;
-    private SparseArray<String> mSelectedMediaArray;
-    private boolean isOriginMedia;
-    private MediaManager mMediaManager;
-    public int MAX_HEIGHT;
-    public int THUMBNAIL_HEIGHT;
-    private int mCurrentPosition;
-    private LinearLayoutManager mLinearLayoutManager;
+    private int mViewPagerCurrentPos;
+    private List<Media> mPreviewMediaList;
+    private int ENTER_MODE = 0;
+    private int MAX_HEIGHT = 0;
+    private int THUMBNAIL_HEIGHT = 0;
+    private Handler mHandler;
     private PreviewThumbnailAdapter mPreviewThumbnailAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
     private PreviewViewpagerAdapter mPreviewViewpagerAdapter;
-    private static int PREVIEW_MODE;
+    public static final int ENTER_BY_SELECT = 1;
+    public static final int ENTER_BY_UNSELECT = 2;
+    public static final String CLICK_POS = "click to enter position";
+    public static final String PREVIEW_MEDIA_FILE_NAME = "need to preview media's file name";
 
-    public static void start(Context context, HashSet<String> selectSet, String fileName, boolean isOriginMedia, int currentPosition) {
-        Intent starter = new Intent(context, PreviewActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(SELECTED_SET, selectSet);
-        starter.putExtra(SELECTED_SET, bundle);
-        starter.putExtra(FILE_NAME, fileName);
-        starter.putExtra(IS_ORIGIN_MEDIA, isOriginMedia);
-        starter.putExtra(CURRENT_POSITION, currentPosition);
+    public static void start(Context context, int clickEnterPos, String previewMediaFileName) {
+        Intent starter = new Intent(context, PreViewActivity.class);
+        starter.putExtra(CLICK_POS, clickEnterPos);
+        starter.putExtra(PREVIEW_MEDIA_FILE_NAME, previewMediaFileName);
         context.startActivity(starter);
     }
 
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_preview);
+        setContentView(R.layout.activity_pre_view);
         ButterKnife.bind(this);
 
-        mMediaManager = new MediaManager();
-        mSelectedMediaArray = new SparseArray<>();
-        mMediaPathArray = new SparseArray<>();
+        init();
+        getData();
+        setListener();
+    }
 
-        initIntent();
-        initUi();
-        clickProcess();
-
-        mPreviewViewpagerAdapter = new PreviewViewpagerAdapter(null, mTvPreviewTitle, mSelectSet, mTvFooterSelect, mIvFooterSelect);
-        mVpPreview.setAdapter(mPreviewViewpagerAdapter);
+    //初始化数据
+    private void init() {
+        mHandler = new Handler();
+        mPreviewMediaList = new ArrayList<>();
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRvPreviewThumbnail.setLayoutManager(mLinearLayoutManager);
-        mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(mSelectSet, mSelectedMediaArray, -1);
-        mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
-        mPreviewViewpagerAdapter.setOnClickHeaderAndFooterChange(this);
-        mPreviewViewpagerAdapter.setOnClickSelect(this);
 
-        initViewPager();
-        initThumbnail();
+        UiManager.updateSendButton(mBtTitleSend);
+        UiManager.updataOiginView(mIvFooterOrigin);
+        UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
 
-    /**
-     * 获取从MainActivity传递的数据 及 一些必要的成员变量初始化
-     */
-    private void initIntent() {
+    //获取上一个activity传输的数据
+    private void getData() {
         Intent intent = getIntent();
-        mSelectSet = (HashSet) intent.getBundleExtra(SELECTED_SET).get(SELECTED_SET);
-        String fileName = intent.getStringExtra(FILE_NAME);
-        isOriginMedia = intent.getBooleanExtra(IS_ORIGIN_MEDIA, false);
-        mCurrentPosition = intent.getIntExtra(CURRENT_POSITION, -1);
-        //一些必要的数据转化
-        //获得已选图片的稀疏数组
-        int position = 0;
-        if(mSelectSet.size() != 0) {
-            Iterator<String> iterator = mSelectSet.iterator();
-            while(iterator.hasNext()) {
-                mSelectedMediaArray.put(position, iterator.next());
-                ++position;
-            }
-        }
-        //获得viewPager需要展示的mediaArray
-        if(fileName == null) {  //当filename传了空值即表示是点击预览进入的
-            mMediaPathArray = mSelectedMediaArray.clone();
-        } else if(fileName.equals("所有图片")) {
-            List<Media> mediaList = mMediaManager.findAllMedia();
-            position = 0;
-            for (Media media : mediaList) {
-                mMediaPathArray.put(position, media.getUrl());
-                ++position;
-            }
-        } else {
-            mMediaPathArray = mMediaManager.findMediaByFileName(fileName);
-        }
-        //进入模式的初识化
-        if(fileName == null) {
-            PREVIEW_MODE = INTENT_BY_PREVIEW;
-        } else {
-            String enterPath = mMediaPathArray.get(mCurrentPosition);
-            if(enterPath == null) {
-                PREVIEW_MODE = INTENT_BY_UNSELECTED;
-            } else {
-                PREVIEW_MODE = INTENT_BY_SELECTED;
-            }
-        }
-    }
-
-    /**
-     * UI的初始化
-     */
-    private void initUi() {
-        //标题的初始化
-        if(PREVIEW_MODE == INTENT_BY_PREVIEW) {
-            mTvPreviewTitle.setText("1/" + mSelectSet.size());
-        } else {
-            mTvPreviewTitle.setText(mCurrentPosition + "/" + mMediaPathArray.size());
-        }
-        //发送的初始化
-        if(mSelectSet.size() != 0) {
-            mBtHeaderSend.setBackgroundColor(0xFF19C917);
-            mBtHeaderSend.setText("发送(" + mSelectSet.size() + "/9)");
-            mBtHeaderSend.setTextColor(Color.WHITE);
-        }
-        //原图的初始化
-        if(isOriginMedia) {
-            mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
-        }
-        //选择的初始化
-        if(mSelectSet.size() != 0 && (MODE_PRIVATE == INTENT_BY_SELECTED || PREVIEW_MODE == INTENT_BY_PREVIEW)) {
-            mIvFooterSelect.setImageResource(R.drawable.select_green_16);
-        }
-    }
-
-    /**
-     * header 和 footer 点击事件的监听
-     */
-    private void clickProcess() {
-        mIvHeaderBack.setOnClickListener(this);
-        mBtHeaderSend.setOnClickListener(this);
-        mIvFooterOrigin.setOnClickListener(this);
-        mTvFooterOrigin.setOnClickListener(this);
-        //选择图片事件的点击不再这里处理
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.iv_header_back:
-                finish();
-                break;
-            case R.id.bt_header_send:
-                if(mSelectSet.size() != 0)
-                    finish();
-                break;
-            case R.id.iv_footer_origin:
-                clickUpdateOriginUi();
-                break;
-            case R.id.tv_footer_origin:
-                clickUpdateOriginUi();
-                break;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        MainActivity.start(PreviewActivity.this, isOriginMedia, mSelectSet);
-        super.onDestroy();
-    }
-
-    /**
-     * 点击原图修改ui事件
-     */
-    private void clickUpdateOriginUi() {
-        if(isOriginMedia) {
-            mIvFooterOrigin.setImageResource(R.drawable.footer_circle_16);
-        } else {
-            mIvFooterOrigin.setImageResource(R.drawable.footer_circle_green_16);
-        }
-        isOriginMedia = ! isOriginMedia;
-    }
-
-    /**
-     * viewpager 的初始化渲染
-     */
-    private void initViewPager() {
-        mPreviewViewpagerAdapter.setMediaPathArray(mMediaPathArray);
-        mPreviewViewpagerAdapter.notifyDataSetChanged();
-        mVpPreview.setCurrentItem(mCurrentPosition);
-    }
-
-    /**
-     * 缩略图 的初始化渲染
-     */
-    private void initThumbnail() {
-        if(mSelectSet.size() == 0) {
-            mRvPreviewThumbnail.setVisibility(View.GONE);
-            mRvPreviewThumbnail.setAlpha(0.0f);
-        } else {
-            mRvPreviewThumbnail.setVisibility(View.VISIBLE);
-            mRvPreviewThumbnail.setAlpha(0.85f);
-            if(PREVIEW_MODE == INTENT_BY_PREVIEW) {
-                mPreviewThumbnailAdapter.setSelectPos(0);
-            } else if(PREVIEW_MODE == INTENT_BY_SELECTED){
-                String enterPath = mMediaPathArray.get(mCurrentPosition);
-                for (int i = 0; i < mSelectedMediaArray.size(); ++i) {
-                    String path = mSelectedMediaArray.get(i);
-                    if(path.equals(enterPath)) {
-                        mPreviewThumbnailAdapter.setSelectPos(i);
-                        break;
+        mViewPagerCurrentPos = intent.getIntExtra(CLICK_POS, -1);
+        final String fileName = intent.getStringExtra(PREVIEW_MEDIA_FILE_NAME);
+        ThreadTask.clear();
+        ThreadTask.addTask(new Runnable() {
+            @Override
+            public void run() {
+                MediaManager mediaManager = new MediaManager();
+                if (fileName == null)    //通过点击预览进入
+                    mPreviewMediaList = SelectedMedia.cloneSelectMediaList();
+                else if (fileName.equals("所有图片"))
+                    mPreviewMediaList = mediaManager.findAllMedia();
+                else
+                    mPreviewMediaList = mediaManager.findMediaListByFileName(fileName);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initThumbnailUi();
+                        initPreviewUi();
                     }
-                }
+                });
             }
-            mPreviewThumbnailAdapter.notifyDataSetChanged();
-            mPreviewThumbnailAdapter.setOnSelectThumbnail(this);
+        });
+    }
+
+    //初始化ThumbnailUi
+    private void initThumbnailUi() {
+        if (mViewPagerCurrentPos == -1) {  //点击预览进入
+            mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(0);
+            mTvHeaderTitle.setText("1/" + SelectedMedia.selectedMediaCount());
+            mViewPagerCurrentPos = 0;
         }
+        else {
+            int clickToEnterMediaInSelectPos = SelectedMedia.getSelectedPosition(mPreviewMediaList.get(mViewPagerCurrentPos).getPath());
+            if (clickToEnterMediaInSelectPos != -1) {
+                ENTER_MODE = ENTER_BY_SELECT;
+                mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(clickToEnterMediaInSelectPos);
+                mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, clickToEnterMediaInSelectPos);
+            } else {
+                ENTER_MODE = ENTER_BY_UNSELECT;
+                mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(-1);
+            }
+            mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
+        }
+        mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
+        mPreviewThumbnailAdapter.setOnThumbnailItemClickListener(PreViewActivity.this);
+
+    }
+
+    //初始化viewPagerUi
+    private void initPreviewUi() {
+        mPreviewViewpagerAdapter = new PreviewViewpagerAdapter(mPreviewMediaList);
+        mVpPreview.setAdapter(mPreviewViewpagerAdapter);
+        mVpPreview.setCurrentItem(mViewPagerCurrentPos);
+        mPreviewViewpagerAdapter.setOnClickHeaderAndFooterChange(this);
+        mVpPreview.addOnPageChangeListener(this);
+        UiManager.updateSelect(mPreviewMediaList.get(mViewPagerCurrentPos).getPath(), mIvFooterSelect);
     }
 
     /**
@@ -286,44 +176,74 @@ public class PreviewActivity extends AppCompatActivity implements PreviewThumbna
         ValueAnimator headerAnimator;
         Animation alphaAnimation;
         if(MAX_HEIGHT == 0) {
-            MAX_HEIGHT = mRlPreviewHeader.getHeight();
+            MAX_HEIGHT = mGalleryTitle.getHeight();
             THUMBNAIL_HEIGHT = mRvPreviewThumbnail.getHeight();
         }
-        if(mRlPreviewHeader.getHeight() == 0) {
-            mRvPreviewThumbnail.setVisibility(View.VISIBLE);
+        UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
+        if(mGalleryTitle.getHeight() == 0) {
             mRlPreviewFooter.setVisibility(View.VISIBLE);
-            headerAnimator = ValueAnimatorManager.viewAnimator(0, MAX_HEIGHT, 300, mRlPreviewHeader);
+            headerAnimator = ValueAnimatorManager.viewAnimator(0, MAX_HEIGHT, 300, mGalleryTitle);
             alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_alpha_to_translucent);
             mRlPreviewFooter.startAnimation(alphaAnimation);
-            mRvPreviewThumbnail.startAnimation(alphaAnimation);
+            if(SelectedMedia.selectedMediaCount() != 0)
+                mRvPreviewThumbnail.startAnimation(alphaAnimation);
         } else {
-            headerAnimator = ValueAnimatorManager.viewAnimator(MAX_HEIGHT, 0, 300, mRlPreviewHeader);
+            headerAnimator = ValueAnimatorManager.viewAnimator(MAX_HEIGHT, 0, 300, mGalleryTitle);
             alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_translucent_to_alpha);
             mRlPreviewFooter.startAnimation(alphaAnimation);
-            mRvPreviewThumbnail.startAnimation(alphaAnimation);
+            if(SelectedMedia.selectedMediaCount() != 0) {
+                mRvPreviewThumbnail.startAnimation(alphaAnimation);
+            }
             mRvPreviewThumbnail.setVisibility(View.GONE);
             mRlPreviewFooter.setVisibility(View.GONE);
         }
         headerAnimator.start();
     }
 
+    //监听事件设定
+    private void setListener() {
+        mIvFooterOrigin.setOnClickListener(this);
+        mTvFooterOrigin.setOnClickListener(this);
+        mTvFooterSelect.setOnClickListener(this);
+        mIvFooterSelect.setOnClickListener(this);
+        mBtTitleSend.setOnClickListener(this);
+        mIvTitleLeftPoint.setOnClickListener(this);
+        mIvFooterSelect.setOnClickListener(this);
+        mTvFooterSelect.setOnClickListener(this);
+        SelectedMedia.setUpdateUi(this);
+    }
+
     @Override
-    public void onSelect(int position) {
-        mPreviewThumbnailAdapter.setSelectPos(position);
-        mPreviewThumbnailAdapter.notifyDataSetChanged();
-        //viewPager也要改变
-        String clickPath = mSelectedMediaArray.get(position);
-        if(PREVIEW_MODE == INTENT_BY_PREVIEW) {
-            mVpPreview.setCurrentItem(mMediaPathArray.indexOfValue(clickPath));
-        } else {
-            for(int i = 0; i < mMediaPathArray.size(); ++i) {
-                if(clickPath.equals(mMediaPathArray.get(i))) {
-                    mVpPreview.setCurrentItem(i);
-                    return;
-                }
-            }
-            Toast.makeText(this, "暂时不支持查看该文件大图", Toast.LENGTH_SHORT).show();
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_footer_origin || v.getId() == R.id.tv_footer_origin)
+            UiManager.listenerUpdateOrigin(mIvFooterOrigin);
+        if (v.getId() == R.id.iv_title_left_point)   //反馈数据给上一个activity
+            finish();
+        if (v.getId() == R.id.bt_title_send && SelectedMedia.selectedMediaCount() != 0)  //反馈数据给上一个activity
+            finish();
+        if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
+            String clickPath = mPreviewMediaList.get(mViewPagerCurrentPos).getPath();
+            UiManager.updateSelectListener(clickPath, mPreviewMediaList, mIvFooterSelect);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onThumbnailItemClick(View view, int position) { //position获取点击的缩略图在已选列表的position
+        String selectPath = SelectedMedia.getSelectedMediaList().get(position).getPath();
+        int pos = MediaManager.findPosByPath(mPreviewMediaList, selectPath);
+        if(pos != -1) {
+            mViewPagerCurrentPos = pos;
+            mVpPreview.setCurrentItem(mViewPagerCurrentPos);
+            mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
+            mPreviewThumbnailAdapter.setCurrentPos(position);
+            mPreviewThumbnailAdapter.notifyDataSetChanged();
+        } else
+            ToastUtil.showToast("暂时不支持查看该文件大图");
     }
 
     @Override
@@ -332,37 +252,42 @@ public class PreviewActivity extends AppCompatActivity implements PreviewThumbna
     }
 
     @Override
-    public void clickSelect(int position) {
-//        String clickedPath = mMediaPathArray.get(position);
-//        if(mSelectSet.remove(clickedPath)) {  //点击选择的图片本就在已选集合中, 移除
-//            for(int i = 0; i < mSelectedMediaArray.size(); ++i) {  //从稀疏数组中删除
-//                if(mSelectedMediaArray.get(i) != null && mSelectedMediaArray.get(i).equals(clickedPath)) {
-//                    mSelectedMediaArray.remove(i);
-//                    break;
-//                }
-//            }
-//            mIvFooterSelect.setImageResource(R.drawable.select_green_16);  //选择图标的修改
-//        } else {
-//            mSelectSet.add(clickedPath);
-//            mSelectedMediaArray.put(mSelectedMediaArray.keyAt(mSelectedMediaArray.size()) + 1, clickedPath);
-//            mIvFooterSelect.setImageResource(R.drawable.select_alpha_16);  //选择图标的修改
-//        }
-//        mPreviewThumbnailAdapter.setMediaPathArray(mSelectedMediaArray);
-//        mPreviewThumbnailAdapter.notifyDataSetChanged();
-//        if(mSelectSet.size() != 0) {  //发送按钮的修改
-//            mBtHeaderSend.setBackgroundColor(0xFF19C917);
-//            mBtHeaderSend.setText("发送(" + mSelectSet.size() + "/9)");
-//            mBtHeaderSend.setTextColor(Color.WHITE);
-//        } else {
-//            mBtHeaderSend.setBackgroundColor(0xFF094909);
-//            mBtHeaderSend.setText("发送");
-//            mBtHeaderSend.setTextColor(0xFFA1A1A1);
-//        }
-//        if(MODE_PRIVATE == INTENT_BY_PREVIEW) { //当是点击预览进入时，viewPager中的数据也需要更新
-//            mMediaPathArray = mSelectedMediaArray.clone();
-//            mPreviewViewpagerAdapter.setMediaPathArray(mMediaPathArray);
-//            mPreviewViewpagerAdapter.notifyDataSetChanged();
-//            mTvPreviewTitle.setText(mCurrentPosition + "/" + mMediaPathArray.size());
-//        }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        mViewPagerCurrentPos = position;
+        mTvHeaderTitle.setText((position + 1) + "/" + mPreviewMediaList.size());
+        String viewpagerCurrentPath = mPreviewMediaList.get(position).getPath();
+        UiManager.updateSelect(viewpagerCurrentPath, mIvFooterSelect);
+        int posInThumbnail = SelectedMedia.getSelectedPosition(viewpagerCurrentPath);
+        mPreviewThumbnailAdapter.setCurrentPos(posInThumbnail);
+        if(posInThumbnail != -1)
+            mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, posInThumbnail);
+        mPreviewThumbnailAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    //被选中的列表发生变更时更新ui
+    @Override
+    public void updateAddSelectMediaUi() {
+        UiManager.updateSendButton(mBtTitleSend);
+        mPreviewThumbnailAdapter.setCurrentPos(SelectedMedia.selectedMediaCount() - 1);
+        mPreviewThumbnailAdapter.notifyDataSetChanged();
+        mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, SelectedMedia.selectedMediaCount() - 1);
+        UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
+    }
+
+    @Override
+    public void updateRemoveSelectMediaUi() {
+        UiManager.updateSendButton(mBtTitleSend);
+        mPreviewThumbnailAdapter.setCurrentPos(-1);
+        mPreviewThumbnailAdapter.notifyDataSetChanged();
+        UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
 }
