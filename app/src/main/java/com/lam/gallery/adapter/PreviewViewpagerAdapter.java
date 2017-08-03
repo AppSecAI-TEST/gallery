@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -49,7 +48,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //渲染加载ui
         Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaList.get(position).getPath() + "200");
         if(bitmap == null) {
-            mediaImage.setImageResource(R.drawable.loading);
+//            mediaImage.setImageResource(R.drawable.loading);
             ThreadTask.addTask(new Runnable() {
                 @Override
                 public void run() {
@@ -59,7 +58,6 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
                         @Override
                         public void run() {
                             if(bitmap != null && (int)mediaImage.getTag() == position) {
-                                Log.d(TAG, "run: ");
                                 mediaImage.setImageBitmap(bitmap);
                             }
                         }

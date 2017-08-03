@@ -71,6 +71,8 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        mScreenHeight = getHeight();
+        mScreenWidth = getWidth();
         super.onLayout(changed, left, top, right, bottom);
     }
 
@@ -227,6 +229,8 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     private class SimpleListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
+            Log.d(TAG, "onDoubleTap: isEnlarged = " + isEnlarged);
+            Log.d(TAG, "onDoubleTap: " + 1.0f * mScreenHeight / mBitmapHeight);
             if(! isEnlarged){ //双击放大
                 putCenter(1.0f * mScreenHeight / mBitmapHeight);
                 isEnlarged = !isEnlarged;
