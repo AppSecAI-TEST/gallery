@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.R2;
 import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.adapter.PreviewThumbnailAdapter;
 import com.lam.gallery.adapter.PreviewViewpagerAdapter;
@@ -36,31 +37,31 @@ import butterknife.ButterKnife;
 
 public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
     private static final String TAG = "PreViewActivity";
-    @BindView(R.id.vp_preview)
+    @BindView(R2.id.vp_preview)
     ViewPager mVpPreview;
-    @BindView(R.id.iv_title_left_point)
+    @BindView(R2.id.iv_title_left_point)
     ImageView mIvTitleLeftPoint;
-    @BindView(R.id.view_title_line)
+    @BindView(R2.id.view_title_line)
     View mViewTitleLine;
-    @BindView(R.id.bt_title_send)
+    @BindView(R2.id.bt_title_send)
     Button mBtTitleSend;
-    @BindView(R.id.gallery_title)
+    @BindView(R2.id.gallery_title)
     RelativeLayout mGalleryTitle;
-    @BindView(R.id.rv_preview_thumbnail)
+    @BindView(R2.id.rv_preview_thumbnail)
     RecyclerView mRvPreviewThumbnail;
-    @BindView(R.id.tv_footer_edit)
+    @BindView(R2.id.tv_footer_edit)
     TextView mTvFooterEdit;
-    @BindView(R.id.iv_footer_origin)
+    @BindView(R2.id.iv_footer_origin)
     ImageView mIvFooterOrigin;
-    @BindView(R.id.tv_footer_origin)
+    @BindView(R2.id.tv_footer_origin)
     TextView mTvFooterOrigin;
-    @BindView(R.id.iv_footer_select)
+    @BindView(R2.id.iv_footer_select)
     ImageView mIvFooterSelect;
-    @BindView(R.id.tv_footer_select)
+    @BindView(R2.id.tv_footer_select)
     TextView mTvFooterSelect;
-    @BindView(R.id.rl_preview_footer)
+    @BindView(R2.id.rl_preview_footer)
     RelativeLayout mRlPreviewFooter;
-    @BindView(R.id.tv_header_title)
+    @BindView(R2.id.tv_header_title)
     TextView mTvHeaderTitle;
 
     private int mViewPagerCurrentPos;
@@ -86,7 +87,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_view);
         ButterKnife.bind(this);
-
         init();
         getData();
         setListener();
@@ -213,9 +213,9 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         if (v.getId() == R.id.iv_footer_origin || v.getId() == R.id.tv_footer_origin)
             UiManager.listenerUpdateOrigin(mIvFooterOrigin);
         if (v.getId() == R.id.iv_title_left_point)   //反馈数据给上一个activity
-            finish();
+            MainActivity.start(this, false);
         if (v.getId() == R.id.bt_title_send && SelectedMedia.selectedMediaCount() != 0)  //反馈数据给上一个activity
-            finish();
+            MainActivity.start(this, true);
         if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
             String clickPath = mPreviewMediaList.get(mViewPagerCurrentPos).getPath();
             int selectedPos = SelectedMedia.getSelectedPosition(clickPath);

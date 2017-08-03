@@ -1,6 +1,8 @@
 package com.lam.gallery.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.R2;
 import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.adapter.FileListAdapter;
 import com.lam.gallery.adapter.MediaGridAdapter;
@@ -33,38 +36,36 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.lam.gallery.R.id.tv_footer_preview;
-
 public class MainActivity extends AppCompatActivity implements MediaManager.InitDataListener, View.OnClickListener, MediaGridAdapter.onClickToIntent, SelectedMedia.UpdateUi, FileListAdapter.OnFileItemClickListener {
 
     private static final String TAG = "MainActivity";
-    @BindView(R.id.iv_title_left_point)
+    @BindView(R2.id.iv_title_left_point)
     ImageView mIvTitleLeftPoint;
-    @BindView(R.id.view_title_line)
+    @BindView(R2.id.view_title_line)
     View mViewTitleLine;
-    @BindView(R.id.bt_title_send)
+    @BindView(R2.id.bt_title_send)
     Button mBtTitleSend;
-    @BindView(R.id.gallery_title)
+    @BindView(R2.id.gallery_title)
     RelativeLayout mGalleryTitle;
-    @BindView(R.id.rv_gallery_grid)
+    @BindView(R2.id.rv_gallery_grid)
     RecyclerView mRvGalleryGrid;
-    @BindView(R.id.tv_footer_file_name)
+    @BindView(R2.id.tv_footer_file_name)
     TextView mTvFooterFileName;
-    @BindView(R.id.iv_footer_file_name)
+    @BindView(R2.id.iv_footer_file_name)
     ImageView mIvFooterFileName;
-    @BindView(R.id.iv_footer_origin)
+    @BindView(R2.id.iv_footer_origin)
     ImageView mIvFooterOrigin;
-    @BindView(R.id.tv_footer_origin)
+    @BindView(R2.id.tv_footer_origin)
     TextView mTvFooterOrigin;
-    @BindView(tv_footer_preview)
+    @BindView(R2.id.tv_footer_preview)
     TextView mTvFooterPreview;
-    @BindView(R.id.rl_gallery_footer)
+    @BindView(R2.id.rl_gallery_footer)
     RelativeLayout mRlGalleryFooter;
-    @BindView(R.id.view_file_list_background)
+    @BindView(R2.id.view_file_list_background)
     View mViewFileListBackground;
-    @BindView(R.id.rv_file_list)
+    @BindView(R2.id.rv_file_list)
     RecyclerView mRvFileList;
-    @BindView(R.id.rl_file_item)
+    @BindView(R2.id.rl_file_item)
     RelativeLayout mRlFileItem;
 
     private List<Media> mMediaList;
@@ -76,6 +77,13 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     private FileListAdapter mFilesListAdapter;
     private Handler mHandler;
     private int mSelectedFilePos;
+    public static final String IS_FINISH_SELECT = "is finish select";
+
+    public static void start(Context context, boolean isFinishSelect) {
+        Intent starter = new Intent(context, MainActivity.class);
+        starter.putExtra(IS_FINISH_SELECT, isFinishSelect);
+        context.startActivity(starter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,13 +158,13 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         if(v.getId() == R.id.iv_footer_origin || v.getId() == R.id.tv_footer_origin)
             UiManager.listenerUpdateOrigin(mIvFooterOrigin);
         if(v.getId() == R.id.iv_title_left_point)   //反馈数据给客户端
-            finish();
-        if(v.getId() == R.id.bt_title_send && SelectedMedia.getSelectedMediaList().size() != 0) //反馈数据给客户端
-            finish();
+            backToMain();
         if(v.getId() == R.id.iv_footer_file_name || v.getId() == R.id.tv_footer_file_name || v.getId() == R.id.view_file_list_background)
             fileListAnimator();
         if(v.getId() == R.id.tv_footer_preview && SelectedMedia.selectedMediaCount() != 0)
             PreviewActivity.start(this, -1, null);
+        if(v.getId() == R.id.bt_title_send && SelectedMedia.getSelectedMediaList().size() != 0) //反馈数据给客户端
+            finish();
     }
 
     /**
@@ -182,6 +190,14 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         }
         fileListAnimator.start();
         fileBackAnimator.start();
+    }
+
+    //取消选择返回主module
+    private void backToMain() {
+        ThreadTask.clear();
+        SelectedMedia.clearData();
+        UiManager.setIsOriginMedia(false);
+        finish();
     }
 
     @Override
@@ -237,21 +253,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
     }
-//    //获取previewActivity变更ui的通知
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        setIntent(intent);
-//
-//    }
-
-    @Override
-    protected void onDestroy() {
-        ThreadTask.clear();
-        ThreadTask.shutDown();
-        SelectedMedia.clearData();
-        UiManager.setIsOriginMedia(false);
-        super.onDestroy();
-    }
 
     @Override
     protected void onRestart() {
@@ -260,5 +261,12 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
         mMediaGridAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        if(intent.getBooleanExtra(IS_FINISH_SELECT, false))
+            finish();
     }
 }

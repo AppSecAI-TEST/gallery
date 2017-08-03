@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.lam.gallery.R;
 import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.manager.BitmapManager;
+import com.lam.gallery.manager.GalleryBitmapFactory;
 import com.lam.gallery.manager.LruCacheManager;
 import com.lam.gallery.ui.PreViewImageView;
 
@@ -52,7 +52,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
             ThreadTask.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = BitmapManager.processBitmap(mMediaList.get(position).getPath(), 200);
+                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(mMediaList.get(position).getPath(), 200);
                     LruCacheManager.addBitmapToCache(mMediaList.get(position).getPath() + "200", bitmap);
                     mHandler.post(new Runnable() {
                         @Override

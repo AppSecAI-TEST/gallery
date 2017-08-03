@@ -1,4 +1,4 @@
-package com.lam.gallery.Task;
+package com.lam.galleryhome.Task;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
