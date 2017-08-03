@@ -65,15 +65,12 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
 
     private int mViewPagerCurrentPos;
     private List<Media> mPreviewMediaList;
-    private int ENTER_MODE = 0;
     private int MAX_HEIGHT = 0;
-    private int THUMBNAIL_HEIGHT = 0;
     private Handler mHandler;
     private PreviewThumbnailAdapter mPreviewThumbnailAdapter;
     private LinearLayoutManager mLinearLayoutManager;
     private PreviewViewpagerAdapter mPreviewViewpagerAdapter;
-    public static final int ENTER_BY_SELECT = 1;
-    public static final int ENTER_BY_UNSELECT = 2;
+    private int mLastThumbnailPos;
     public static final String CLICK_POS = "click to enter position";
     public static final String PREVIEW_MEDIA_FILE_NAME = "need to preview media's file name";
 
@@ -102,7 +99,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRvPreviewThumbnail.setLayoutManager(mLinearLayoutManager);
-
+        mLastThumbnailPos = -1;
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updataOiginView(mIvFooterOrigin);
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
@@ -141,17 +138,16 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(0);
             mTvHeaderTitle.setText("1/" + SelectedMedia.selectedMediaCount());
             mViewPagerCurrentPos = 0;
+            mLastThumbnailPos = 0;
         }
         else {
             int clickToEnterMediaInSelectPos = SelectedMedia.getSelectedPosition(mPreviewMediaList.get(mViewPagerCurrentPos).getPath());
             if (clickToEnterMediaInSelectPos != -1) {
-                ENTER_MODE = ENTER_BY_SELECT;
                 mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(clickToEnterMediaInSelectPos);
                 mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, clickToEnterMediaInSelectPos);
-            } else {
-                ENTER_MODE = ENTER_BY_UNSELECT;
+                mLastThumbnailPos = clickToEnterMediaInSelectPos;
+            } else
                 mPreviewThumbnailAdapter = new PreviewThumbnailAdapter(-1);
-            }
             mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
         }
         mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
@@ -177,7 +173,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         Animation alphaAnimation;
         if(MAX_HEIGHT == 0) {
             MAX_HEIGHT = mGalleryTitle.getHeight();
-            THUMBNAIL_HEIGHT = mRvPreviewThumbnail.getHeight();
         }
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
         if(mGalleryTitle.getHeight() == 0) {
@@ -223,13 +218,17 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             finish();
         if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
             String clickPath = mPreviewMediaList.get(mViewPagerCurrentPos).getPath();
-            UiManager.updateSelectListener(clickPath, mPreviewMediaList, mIvFooterSelect);
+            int selectedPos = SelectedMedia.getSelectedPosition(clickPath);
+            int posInMediaList = MediaManager.findPosByPath(mPreviewMediaList, clickPath);
+            if(selectedPos == -1) {   //当点击的图片尚未被选中
+                SelectedMedia.addSelected(mPreviewMediaList.get(posInMediaList));
+            } else {   //当点击的图片原为选中的图片--即点击取消选择
+                mPreviewThumbnailAdapter.setCurrentPos(-1);
+                mLastThumbnailPos = -1;
+                mPreviewThumbnailAdapter.notifyItemRemoved(selectedPos);
+                SelectedMedia.removeByPosition(selectedPos);
+            }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -241,7 +240,8 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             mVpPreview.setCurrentItem(mViewPagerCurrentPos);
             mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
             mPreviewThumbnailAdapter.setCurrentPos(position);
-            mPreviewThumbnailAdapter.notifyDataSetChanged();
+            mPreviewThumbnailAdapter.notifyItemChanged(-1);
+            mLastThumbnailPos = position;
         } else
             ToastUtil.showToast("暂时不支持查看该文件大图");
     }
@@ -263,14 +263,16 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         UiManager.updateSelect(viewpagerCurrentPath, mIvFooterSelect);
         int posInThumbnail = SelectedMedia.getSelectedPosition(viewpagerCurrentPath);
         mPreviewThumbnailAdapter.setCurrentPos(posInThumbnail);
-        if(posInThumbnail != -1)
+        mPreviewThumbnailAdapter.notifyItemChanged(mLastThumbnailPos);
+        mLastThumbnailPos = posInThumbnail;
+        if(posInThumbnail != -1) {      //viewPager展示的图片是被选择的图片
             mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, posInThumbnail);
-        mPreviewThumbnailAdapter.notifyDataSetChanged();
+        }
+        mPreviewThumbnailAdapter.notifyItemChanged(mLastThumbnailPos);
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
     }
 
     //被选中的列表发生变更时更新ui
@@ -278,8 +280,9 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public void updateAddSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
         mIvFooterSelect.setImageResource(R.drawable.select_green_16);
-        mPreviewThumbnailAdapter.setCurrentPos(SelectedMedia.selectedMediaCount() - 1);
-        mPreviewThumbnailAdapter.notifyDataSetChanged();
+        mLastThumbnailPos = SelectedMedia.selectedMediaCount() - 1;
+        mPreviewThumbnailAdapter.setCurrentPos(mLastThumbnailPos);
+        mPreviewThumbnailAdapter.notifyItemInserted(mLastThumbnailPos);
         mLinearLayoutManager.smoothScrollToPosition(mRvPreviewThumbnail, null, SelectedMedia.selectedMediaCount() - 1);
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
@@ -288,8 +291,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public void updateRemoveSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
         mIvFooterSelect.setImageResource(R.drawable.select_alpha_16);
-        mPreviewThumbnailAdapter.setCurrentPos(-1);
-        mPreviewThumbnailAdapter.notifyDataSetChanged();
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
 }

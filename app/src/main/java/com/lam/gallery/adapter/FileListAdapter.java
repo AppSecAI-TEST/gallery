@@ -13,8 +13,8 @@ import android.widget.TextView;
 import com.lam.gallery.R;
 import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.MediaFile;
-import com.lam.gallery.manager.MediaManager;
 import com.lam.gallery.manager.LruCacheManager;
+import com.lam.gallery.manager.MediaManager;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -64,7 +64,6 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
         ImageView fileNameSelectedView = fileListViewHolder.getFileSelect();
         final ImageView fileCoverView = fileListViewHolder.getFileCover();
         //初始化类
-        fileCoverView.setImageResource(R.drawable.loading);
         fileNameSelectedView.setVisibility(View.GONE);
         // 标记类
         fileCoverView.setTag(position);
@@ -75,26 +74,28 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
             fileListViewHolder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
             fileListViewHolder.getFileSelect().setVisibility(View.VISIBLE);
         }
-        ThreadTask.addTask(new Runnable() {
-            @Override
-            public void run() {
-                String path = mMediaFileList.get(position).getFileCoverPath();
-                Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-                if(bitmap == null) {
-                    bitmap = MediaManager.getThumbnail(mMediaFileList.get(position).getCoverPathId());
+        final String path = mMediaFileList.get(position).getFileCoverPath();
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
+        if(bitmap == null) {
+            fileCoverView.setImageResource(R.drawable.loading);
+            ThreadTask.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaFileList.get(position).getCoverPathId());
                     LruCacheManager.addBitmapToCache(path, bitmap);
-                }
-                final Bitmap correctBitmap = bitmap;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if((int)fileCoverView.getTag() == position) {
-                            fileCoverView.setImageBitmap(correctBitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if((int)fileCoverView.getTag() == position) {
+                                fileCoverView.setImageBitmap(bitmap);
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        } else {
+            fileCoverView.setImageBitmap(bitmap);
+        }
 
         if (holder != null) {
             if (mOnFileItemClickListener != null)

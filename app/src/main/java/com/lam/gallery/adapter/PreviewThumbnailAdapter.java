@@ -25,7 +25,7 @@ import java.util.List;
  */
 
 public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements View.OnClickListener {
-
+    private static final String TAG = "PreviewThumbnailAdapter";
     protected OnThumbnailItemClickListener mOnThumbnailItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
     private int mCurrentPos;
@@ -62,35 +62,34 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         final ImageView thumbnailImage = thumbnailViewHolder.getThumbnailImage();
         RelativeLayout selectedView = thumbnailViewHolder.getSelectedView();
         //初始化
-//        thumbnailImage.setImageResource(R.drawable.loading);
         selectedView.setVisibility(View.INVISIBLE);
         //标记类
         thumbnailImage.setTag(position);
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-        ThreadTask.addTask(new Runnable() {
-            @Override
-            public void run() {
-                if(mMediaList.size() > position) {
-                    String path = mMediaList.get(position).getPath();
-                    Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-                    if(bitmap == null) {
-                        bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
-                        LruCacheManager.addBitmapToCache(path, bitmap);
-                    }
-                    final Bitmap correctBitmap = bitmap;
+        final String path = mMediaList.get(position).getPath();
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
+        if(bitmap == null) {
+            thumbnailImage.setImageResource(R.drawable.loading);
+            ThreadTask.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
+                    LruCacheManager.addBitmapToCache(path, bitmap);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             if((int)thumbnailImage.getTag() == position) {
-                                thumbnailImage.setImageBitmap(correctBitmap);
+                                thumbnailImage.setImageBitmap(bitmap);
                             }
                         }
                     });
                 }
-            }
-        });
+            });
+        } else {
+            thumbnailImage.setImageBitmap(bitmap);
+        }
     }
 
     public class ThumbnailViewHolder extends RecyclerView.ViewHolder {

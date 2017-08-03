@@ -15,9 +15,9 @@ import android.widget.ImageView;
 import com.lam.gallery.R;
 import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.manager.MediaManager;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.LruCacheManager;
+import com.lam.gallery.manager.MediaManager;
 import com.lam.gallery.ui.GridViewImageItem;
 
 import java.util.List;
@@ -60,42 +60,38 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         final ImageView selectImage = ((GridViewHolder) holder).getImageView();
         final GridViewImageItem gridViewImageItem = ((GridViewHolder) holder).getGridViewImageItem();
         //初始化
-        gridViewImageItem.setImageResource(R.drawable.loading);
         selectImage.setImageResource(R.drawable.select_alpha_16);
         //设置标记setTag类
         gridViewImageItem.setTag(position);
         selectImage.setTag(position);
         //加载渲染ui
-        ThreadTask.addTask(new Runnable() {
-            @Override
-            public void run() {
-                String path = mMediaList.get(position).getPath();
-                if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
+        final String path = mMediaList.get(position).getPath();
+        if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
+            selectImage.setImageResource(R.drawable.select_green_16);
+            gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        }
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
+        if(bitmap == null) {
+            gridViewImageItem.setImageResource(R.drawable.loading);
+            ThreadTask.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
+                    LruCacheManager.addBitmapToCache(path, bitmap);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            selectImage.setImageResource(R.drawable.select_green_16);
-                            gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                            if((int)gridViewImageItem.getTag() == position) {
+                                gridViewImageItem.setImageBitmap(bitmap);
+                            }
                         }
                     });
                 }
-                Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-                if(bitmap == null) {
-                    bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
-                    LruCacheManager.addBitmapToCache(path, bitmap);
-                }
-                final Bitmap correctBitmap = bitmap;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if((int)gridViewImageItem.getTag() == position) {
-                            gridViewImageItem.setImageBitmap(correctBitmap);
-                        }
-                    }
-                });
-            }
-        });
-
+            });
+        } else {
+            gridViewImageItem.setImageBitmap(bitmap);
+        }
+        //设置监听
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

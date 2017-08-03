@@ -81,10 +81,10 @@ public class UiManager {
         int posInMediaList = MediaManager.findPosByPath(mediaList, clickPath);
         if(selectedPos == -1) {   //当点击的图片尚未被选中
             SelectedMedia.addSelected(mediaList.get(posInMediaList));
-            imageView.setImageResource(R.drawable.select_green_16);
+//            imageView.setImageResource(R.drawable.select_green_16);
         } else {   //当点击的图片原为选中的图片
             SelectedMedia.removeByPosition(selectedPos);
-            imageView.setImageResource(R.drawable.select_alpha_16);
+//            imageView.setImageResource(R.drawable.select_alpha_16);
         }
     }
 
