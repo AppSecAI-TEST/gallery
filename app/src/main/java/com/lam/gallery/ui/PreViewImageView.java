@@ -93,6 +93,7 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     //将图片置于屏幕中心
     //主要用于双击事件、图片放缩过度时
     private void putCenter(float scaleSize) {
+        Log.d(TAG, "putCenter: ");
         initData(scaleSize);
         float dx = mScreenWidth / 2 - mRightAndBottomPoint.x / 2;
         float dy = mScreenHeight / 2 - mRightAndBottomPoint.y / 2;

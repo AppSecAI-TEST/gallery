@@ -42,24 +42,24 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
-        Log.d(TAG, "instantiateItem: ");
         View view = View.inflate(container.getContext(), R.layout.item_preview_viewpager, null);
         final PreViewImageView mediaImage = (PreViewImageView) view.findViewById(R.id.pr_preview_media);
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaList.get(position).getPath());
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaList.get(position).getPath() + "200");
         if(bitmap == null) {
             mediaImage.setImageResource(R.drawable.loading);
             ThreadTask.addTask(new Runnable() {
                 @Override
                 public void run() {
                     final Bitmap bitmap = BitmapManager.processBitmap(mMediaList.get(position).getPath(), 200);
-                    LruCacheManager.addBitmapToCache(mMediaList.get(position).getPath(), bitmap);
+                    LruCacheManager.addBitmapToCache(mMediaList.get(position).getPath() + "200", bitmap);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             if(bitmap != null && (int)mediaImage.getTag() == position) {
+                                Log.d(TAG, "run: ");
                                 mediaImage.setImageBitmap(bitmap);
                             }
                         }

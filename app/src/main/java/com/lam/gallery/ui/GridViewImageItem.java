@@ -36,8 +36,6 @@ public class GridViewImageItem extends android.support.v7.widget.AppCompatImageV
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "onTouchEvent: ");
@@ -47,7 +45,7 @@ public class GridViewImageItem extends android.support.v7.widget.AppCompatImageV
                 isMove = true;
                 break;
             case MotionEvent.ACTION_UP:
-                if(x < (mViewLength - mSelectLength) && y > mSelectLength && ! isMove) {
+                if(! isMove) {
                     if(sOnIntentToPreviewListener != null) {
                         sOnIntentToPreviewListener.onClickToIntent(this);
                     }
