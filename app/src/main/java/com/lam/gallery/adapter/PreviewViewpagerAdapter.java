@@ -1,17 +1,12 @@
 package com.lam.gallery.adapter;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.lam.gallery.R;
-import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.manager.GalleryBitmapFactory;
-import com.lam.gallery.manager.LruCacheManager;
 import com.lam.gallery.ui.PreViewImageView;
 
 import java.util.List;
@@ -23,7 +18,6 @@ import java.util.List;
 public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImageView.OnClickItemViewListener {
     private static final String TAG = "PreviewViewpagerAdapter";
     private List<Media> mMediaList;
-    private Handler mHandler;
     private static OnClickHeaderAndFooterChange sOnClickHeaderAndFooterChange;
 
     public static void setOnClickHeaderAndFooterChange(OnClickHeaderAndFooterChange onClickHeaderAndFooterChange) {
@@ -32,7 +26,6 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
 
     public PreviewViewpagerAdapter(List<Media> mediaList) {
         mMediaList = mediaList;
-        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setMediaList(List<Media> mediaList) {
@@ -46,27 +39,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        Bitmap bitmap = LruCacheManager.getBitmapFromCache(mMediaList.get(position).getPath() + "200");
-        if(bitmap == null) {
-//            mediaImage.setImageResource(R.drawable.loading);
-            ThreadTask.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(mMediaList.get(position).getPath(), 200);
-                    LruCacheManager.addBitmapToCache(mMediaList.get(position).getPath() + "200", bitmap);
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(bitmap != null && (int)mediaImage.getTag() == position) {
-                                mediaImage.setImageBitmap(bitmap);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            mediaImage.setImageBitmap(bitmap);
-        }
+        GalleryBitmapFactory.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 200);
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;

@@ -1,8 +1,5 @@
 package com.lam.gallery.adapter;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +8,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.R;
-import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.manager.LruCacheManager;
-import com.lam.gallery.manager.MediaManager;
+import com.lam.gallery.manager.GalleryBitmapFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -29,12 +24,10 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
     protected OnThumbnailItemClickListener mOnThumbnailItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
     private int mCurrentPos;
-    private Handler mHandler;
     private List<Media> mMediaList;
 
     public PreviewThumbnailAdapter(int currentPos) {
         mCurrentPos = currentPos;
-        mHandler = new Handler(Looper.getMainLooper());
         mMediaList = SelectedMedia.getSelectedMediaList();
     }
 
@@ -68,28 +61,7 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-        final String path = mMediaList.get(position).getPath();
-        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-        if(bitmap == null) {
-            thumbnailImage.setImageResource(R.drawable.loading);
-            ThreadTask.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
-                    LruCacheManager.addBitmapToCache(path, bitmap);
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if((int)thumbnailImage.getTag() == position) {
-                                thumbnailImage.setImageBitmap(bitmap);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            thumbnailImage.setImageBitmap(bitmap);
-        }
+        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
     }
 
     public class ThumbnailViewHolder extends RecyclerView.ViewHolder {
@@ -123,7 +95,6 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         if (recyclerView != null) {
             int position = recyclerView.getChildAdapterPosition(v);
             mOnThumbnailItemClickListener.onThumbnailItemClick(v, position);
-
         }
     }
 

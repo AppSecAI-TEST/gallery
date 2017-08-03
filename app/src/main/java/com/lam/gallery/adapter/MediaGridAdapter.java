@@ -2,8 +2,6 @@ package com.lam.gallery.adapter;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,12 +25,10 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
     private static final String TAG = "MediaGridAdapter";
 
     private List<Media> mMediaList;
-    private Handler mHandler;
     private static onClickToIntent sOnClickToIntent;
 
     public MediaGridAdapter(List<Media> mediaList) {
         mMediaList = mediaList;
-        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setMediaList(List<Media> mediaList) {
@@ -62,33 +58,12 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         gridViewImageItem.setTag(position);
         selectImage.setTag(position);
         //加载渲染ui
-        GalleryBitmapFactory.loadThumbnail(mMediaList.get(position), gridViewImageItem, position);
+        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
         String path = mMediaList.get(position).getPath();
         if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
             selectImage.setImageResource(R.drawable.select_green_16);
             gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
-//        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-//        if(bitmap == null) {
-//            gridViewImageItem.setImageResource(R.drawable.loading);
-//            ThreadTask.addTask(new Runnable() {
-//                @Override
-//                public void run() {
-//                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaList.get(position).getMediaId());
-//                    LruCacheManager.addBitmapToCache(path, bitmap);
-//                    mHandler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if((int)gridViewImageItem.getTag() == position) {
-//                                gridViewImageItem.setImageBitmap(bitmap);
-//                            }
-//                        }
-//                    });
-//                }
-//            });
-//        } else {
-//            gridViewImageItem.setImageBitmap(bitmap);
-//        }
         //设置监听
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override

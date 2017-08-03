@@ -1,8 +1,5 @@
 package com.lam.gallery.adapter;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
-import com.lam.gallery.Task.ThreadTask;
 import com.lam.gallery.db.MediaFile;
-import com.lam.gallery.manager.LruCacheManager;
-import com.lam.gallery.manager.MediaManager;
+import com.lam.gallery.manager.GalleryBitmapFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -27,14 +22,12 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
 
     private List<MediaFile> mMediaFileList;
     private int mSelectedFilePos;
-    private Handler mHandler;
     protected OnFileItemClickListener mOnFileItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
 
     public FileListAdapter(List<MediaFile> mediaFileList, int selectedFilePos) {
         mMediaFileList = mediaFileList;
         mSelectedFilePos = selectedFilePos;
-        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setOnFileItemClickListener(OnFileItemClickListener listener) {
@@ -74,29 +67,7 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
             fileListViewHolder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
             fileListViewHolder.getFileSelect().setVisibility(View.VISIBLE);
         }
-        final String path = mMediaFileList.get(position).getFileCoverPath();
-        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
-        if(bitmap == null) {
-            fileCoverView.setImageResource(R.drawable.loading);
-            ThreadTask.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    final Bitmap bitmap = MediaManager.getThumbnail(mMediaFileList.get(position).getCoverPathId());
-                    LruCacheManager.addBitmapToCache(path, bitmap);
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if((int)fileCoverView.getTag() == position) {
-                                fileCoverView.setImageBitmap(bitmap);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            fileCoverView.setImageBitmap(bitmap);
-        }
-
+        GalleryBitmapFactory.loadThumbnailWithTag(mMediaFileList.get(position).getFileCoverPath(), mMediaFileList.get(position).getCoverPathId(), fileCoverView, position);
         if (holder != null) {
             if (mOnFileItemClickListener != null)
                 holder.itemView.setOnClickListener(this);

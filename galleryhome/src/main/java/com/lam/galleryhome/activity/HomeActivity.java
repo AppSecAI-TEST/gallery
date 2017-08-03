@@ -1,16 +1,19 @@
-package com.lam.galleryhome;
+package com.lam.galleryhome.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.lam.gallery.GetSelectedMedia;
+import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.activity.MainActivity;
 import com.lam.gallery.db.Media;
+import com.lam.galleryhome.adapter.PathShowAdapter;
+import com.lam.galleryhome.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     Button mBtSelectPicture;
     @BindView(R.id.rv_show_list)
     RecyclerView mRvShowList;
+    @BindView(R.id.bt_clear_select)
+    Button mBtClearSelect;
+    @BindView(R.id.rl_menu)
+    RelativeLayout mRlMenu;
 
     private boolean mIsOrigin;
     private List<Media> mSelectedMediaList;
@@ -40,7 +47,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mSelectedMediaList = new ArrayList<>();
         mIsOrigin = false;
         mBtSelectPicture.setOnClickListener(this);
-
+        mBtClearSelect.setOnClickListener(this);
 
         mLinearLayoutManager = new LinearLayoutManager(HomeActivity.this);
         mRvShowList.setLayoutManager(mLinearLayoutManager);
@@ -56,8 +63,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.bt_select_picture) {
+        if(v.getId() == R.id.bt_select_picture)
             MainActivity.start(this, false);
+        if(v.getId() == R.id.bt_clear_select) {
+            mSelectedMediaList.clear();
+            mIsOrigin = false;
+            mPathShowAdapter.setMediaList(mSelectedMediaList);
+            mPathShowAdapter.setOrigin(mIsOrigin);
+            mPathShowAdapter.notifyDataSetChanged();
         }
     }
 
@@ -69,6 +82,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mPathShowAdapter.setMediaList(mSelectedMediaList);
         mPathShowAdapter.setOrigin(mIsOrigin);
         mPathShowAdapter.notifyDataSetChanged();
-        Log.d(TAG, "getSelectedMedia: " + mPathShowAdapter.mMediaList.size());
+    }
+
+    @Override
+    protected void onDestroy() {
+        ThreadManager.clear();
+        ThreadManager.shutDown();
+        super.onDestroy();
     }
 }

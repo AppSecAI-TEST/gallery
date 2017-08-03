@@ -6,8 +6,6 @@ import android.widget.ImageView;
 
 import com.lam.gallery.GalleryApplication;
 import com.lam.gallery.R;
-import com.lam.gallery.Task.ThreadTask;
-import com.lam.gallery.db.Media;
 
 /**
  * Created by lenovo on 2017/7/28.
@@ -26,15 +24,14 @@ public class GalleryBitmapFactory {
         return mHandler;
     }
 
-    public static void loadThumbnail(final Media media, final ImageView imageView, final Object tag) {
-        final String path = media.getPath();
+    public static void loadThumbnailWithTag(final String path, final int thumbnailId, final ImageView imageView, final Object tag) {
         Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
         if(bitmap == null) {
             imageView.setImageResource(R.drawable.loading);
-            ThreadTask.addTask(new Runnable() {
+            ThreadManager.addTask(new Runnable() {
                 @Override
                 public void run() {
-                    final Bitmap bitmap = MediaManager.getThumbnail(media.getMediaId());
+                    final Bitmap bitmap = MediaManager.getThumbnail(thumbnailId);
                     LruCacheManager.addBitmapToCache(path, bitmap);
                     getHandler().post(new Runnable() {
                         @Override
@@ -51,11 +48,177 @@ public class GalleryBitmapFactory {
         }
     }
 
-    public static Bitmap processBitmap(String path, int SIZE) {
+    public static void loadThumbnail(final String path, final int thumbnailId, final ImageView imageView) {
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(path);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = MediaManager.getThumbnail(thumbnailId);
+                    LruCacheManager.addBitmapToCache(path, bitmap);
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(bitmap);
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadProcessBitmap(final String path, final ImageView imageView, final int reqHeight, final int reqWidth) {
+        final String lruCacheKey = reqHeight + reqWidth + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(path, reqHeight, reqWidth);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(bitmap);
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadProcessBitmapWithTag(final String path, final ImageView imageView, final Object tag, final int reqHeight, final int reqWidth) {
+        final String lruCacheKey = reqHeight + reqWidth + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(path, reqHeight, reqWidth);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(bitmap != null && (int)imageView.getTag() == (int)tag) {
+                                imageView.setImageBitmap(bitmap);
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadProcessBitmap(final String path, final ImageView imageView, final int reqSize) {
+        final String lruCacheKey = reqSize + reqSize + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(path, reqSize, reqSize);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(bitmap);
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadProcessBitmapWithTag(final String path, final ImageView imageView, final Object tag, final int reqSize) {
+        final String lruCacheKey = reqSize + reqSize + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = GalleryBitmapFactory.processBitmap(path, reqSize, reqSize);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(bitmap != null && (int)imageView.getTag() == (int)tag) {
+                                imageView.setImageBitmap(bitmap);
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadOriginBitmapWithTag(final String path, final ImageView imageView, final Object tag) {
+        final String lruCacheKey = "origin" + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(path);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(bitmap != null && (int)imageView.getTag() == (int)tag) {
+                                imageView.setImageBitmap(bitmap);
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public static void loadOriginBitmap(final String path, final ImageView imageView) {
+        final String lruCacheKey = "origin" + path;
+        Bitmap bitmap = LruCacheManager.getBitmapFromCache(lruCacheKey);
+        if(bitmap == null) {
+            imageView.setImageResource(R.drawable.loading);
+            ThreadManager.addTask(new Runnable() {
+                @Override
+                public void run() {
+                    final Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(path);
+                    LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(bitmap);
+                        }
+                    });
+                }
+            });
+        } else {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    private static Bitmap processBitmap(String path, int reqWidth, int reqHeight) {
         android.graphics.BitmapFactory.Options options = new android.graphics.BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         android.graphics.BitmapFactory.decodeFile(path, options);
-        int inSampleSize = calculateInSampleSize(options, SIZE, SIZE);
+        int inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
         options.inJustDecodeBounds = false;
         options.inSampleSize = inSampleSize;
         return android.graphics.BitmapFactory.decodeFile(path, options);
@@ -75,9 +238,5 @@ public class GalleryBitmapFactory {
             inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
         }
         return inSampleSize;
-    }
-
-    public static long getBitmapSize(Bitmap bitmap) {
-        return bitmap.getRowBytes() * bitmap.getHeight();
     }
 }

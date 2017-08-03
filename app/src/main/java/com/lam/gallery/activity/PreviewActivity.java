@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.R2;
-import com.lam.gallery.Task.ThreadTask;
+import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.adapter.PreviewThumbnailAdapter;
 import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
@@ -110,8 +110,8 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = getIntent();
         mViewPagerCurrentPos = intent.getIntExtra(CLICK_POS, -1);
         final String fileName = intent.getStringExtra(PREVIEW_MEDIA_FILE_NAME);
-        ThreadTask.clear();
-        ThreadTask.addTask(new Runnable() {
+        ThreadManager.clear();
+        ThreadManager.addTask(new Runnable() {
             @Override
             public void run() {
                 MediaManager mediaManager = new MediaManager();

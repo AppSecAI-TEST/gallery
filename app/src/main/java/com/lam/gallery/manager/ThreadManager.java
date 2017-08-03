@@ -1,4 +1,4 @@
-package com.lam.gallery.Task;
+package com.lam.gallery.manager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * Created by lenovo on 2017/7/28.
  */
 
-public class ThreadTask {
+public class ThreadManager {
     private static LinkedBlockingDeque<Runnable> mLinkedBlockingDeque;
     private static ExecutorService mExecutorService;
 

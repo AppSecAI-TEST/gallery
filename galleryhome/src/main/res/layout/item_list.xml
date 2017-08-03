@@ -8,8 +8,7 @@
         android:id="@+id/iv_image"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"/>
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:id="@+id/tv_path"
@@ -19,15 +18,8 @@
         android:layout_below="@+id/iv_image"
         android:textSize="15sp"
         android:text="图片路径"
-        android:textColor="#000"/>
+        android:textColor="#000"
+        android:layout_margin="10dp"/>
 
-    <TextView
-        android:id="@+id/tv_size"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/tv_path"
-        android:textSize="12sp"
-        android:textColor="#464646"/>
 
 </RelativeLayout>

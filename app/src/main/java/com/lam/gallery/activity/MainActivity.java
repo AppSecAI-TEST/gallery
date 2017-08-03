@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.R2;
-import com.lam.gallery.Task.ThreadTask;
+import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.adapter.FileListAdapter;
 import com.lam.gallery.adapter.MediaGridAdapter;
 import com.lam.gallery.db.Media;
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mGridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
         mLinearLayoutManager = new LinearLayoutManager(MainActivity.this);
         mHandler = new Handler();
-        ThreadTask.addTask(new Runnable() {
+        ThreadManager.addTask(new Runnable() {
             @Override
             public void run() {     //开启子线程加载数据
                 MediaManager mediaManager = new MediaManager();
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //取消选择返回主module
     private void backToMain() {
-        ThreadTask.clear();
+        ThreadManager.clear();
         SelectedMedia.clearData();
         UiManager.setIsOriginMedia(false);
         finish();
@@ -227,13 +227,13 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mTvFooterFileName.setText(mMediaFileList.get(position).getFileName());
         mMediaGridAdapter.setMediaList(null);
         mMediaGridAdapter.notifyDataSetChanged();
-        ThreadTask.clear();
+        ThreadManager.clear();
         if(position == 0) {
             mMediaGridAdapter.setMediaList(mMediaList);
             mMediaGridAdapter.notifyDataSetChanged();
             mSelectMediaFileList = mMediaList;
         } else {
-            ThreadTask.addTask(new Runnable() {
+            ThreadManager.addTask(new Runnable() {
                 @Override
                 public void run() {
                     MediaManager mediaManager = new MediaManager();
