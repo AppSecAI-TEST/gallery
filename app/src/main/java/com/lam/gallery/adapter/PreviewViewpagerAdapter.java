@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.manager.GalleryBitmapFactory;
+import com.lam.gallery.manager.GalleryBitmapManager;
 import com.lam.gallery.ui.PreViewImageView;
 
 import java.util.List;
@@ -28,10 +28,6 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         mMediaList = mediaList;
     }
 
-    public void setMediaList(List<Media> mediaList) {
-        mMediaList = mediaList;
-    }
-
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
         View view = View.inflate(container.getContext(), R.layout.item_preview_viewpager, null);
@@ -39,7 +35,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        GalleryBitmapFactory.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 200);
+        GalleryBitmapManager.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 200);
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lam.gallery.db.Media;
-import com.lam.gallery.manager.GalleryBitmapFactory;
+import com.lam.gallery.manager.GalleryBitmapManager;
 import com.lam.galleryhome.R;
 
 import java.util.List;
@@ -54,10 +54,10 @@ public class PathShowAdapter extends RecyclerView.Adapter {
         //开始绑定渲染
         final String path = mMediaList.get(position).getPath();
         if(mIsOrigin) {
-            GalleryBitmapFactory.loadOriginBitmapWithTag(mMediaList.get(position).getPath(), imageView, position);
+            GalleryBitmapManager.loadOriginBitmapWithTag(mMediaList.get(position).getPath(), imageView, position);
 //            BitmapTaskDispatcher.getLIFOTaskDispatcher().loadProcessBitmapWithTag(mMediaList.get(position).getPath(), imageView, position, 200);
         } else {
-            GalleryBitmapFactory.loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
+            GalleryBitmapManager.loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
 //            BitmapTaskDispatcher.getLIFOTaskDispatcher().loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
         }
     }

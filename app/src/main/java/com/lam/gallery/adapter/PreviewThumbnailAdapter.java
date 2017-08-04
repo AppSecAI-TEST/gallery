@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.manager.GalleryBitmapFactory;
+import com.lam.gallery.manager.GalleryBitmapManager;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements View.OnClickListener {
     private static final String TAG = "PreviewThumbnailAdapter";
-    protected OnThumbnailItemClickListener mOnThumbnailItemClickListener;
+    private OnThumbnailItemClickListener mOnThumbnailItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
     private int mCurrentPos;
     private List<Media> mMediaList;
@@ -42,10 +42,8 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_preview_thumbnail, null);
         ThumbnailViewHolder holder = new ThumbnailViewHolder(view);
         //监听设置
-        if (holder != null) {
-            if (mOnThumbnailItemClickListener != null)
-                holder.itemView.setOnClickListener(this);
-        }
+        if (mOnThumbnailItemClickListener != null)
+            holder.itemView.setOnClickListener(this);
         return holder;
     }
 
@@ -61,21 +59,21 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
+        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
     }
 
-    public class ThumbnailViewHolder extends RecyclerView.ViewHolder {
+    private class ThumbnailViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout mSelectedView ;
         private ImageView mThumbnailImage;
-        public ThumbnailViewHolder(View itemView) {
+        private ThumbnailViewHolder(View itemView) {
             super(itemView);
             mSelectedView = (RelativeLayout) itemView.findViewById(R.id.rl_thumbnail_selected);
             mThumbnailImage = (ImageView) itemView.findViewById(R.id.iv_thumbnail);
         }
-        public RelativeLayout getSelectedView() {
+        private RelativeLayout getSelectedView() {
             return mSelectedView;
         }
-        public ImageView getThumbnailImage() {
+        private ImageView getThumbnailImage() {
             return mThumbnailImage;
         }
     }

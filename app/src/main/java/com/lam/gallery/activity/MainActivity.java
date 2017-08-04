@@ -196,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //取消选择返回主module
     private void backToMain() {
-//        ThreadManager.clear();
         BitmapTaskDispatcher.clear();
         SelectedMedia.clearData();
         UiManager.setIsOriginMedia(false);
@@ -230,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mTvFooterFileName.setText(mMediaFileList.get(position).getFileName());
         mMediaGridAdapter.setMediaList(null);
         mMediaGridAdapter.notifyDataSetChanged();
-//        ThreadManager.clear();
         BitmapTaskDispatcher.clear();
         if(position == 0) {
             mMediaGridAdapter.setMediaList(mMediaList);
@@ -278,5 +276,11 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         backToMain();
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        BitmapTaskDispatcher.clear();
+        super.onDestroy();
     }
 }

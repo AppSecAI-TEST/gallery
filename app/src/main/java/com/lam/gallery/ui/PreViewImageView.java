@@ -160,46 +160,47 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "onTouchEvent: ");
         mGestureDetector.onTouchEvent(event);
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                getParent().requestDisallowInterceptTouchEvent(true);
-                MODE = TRANSLATION;
-                mCurrentPoint.set(event.getX(), event.getY());
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(MODE == TRANSLATION && isEnlarged) {
-                    float dx = event.getX() - mCurrentPoint.x;
-                    float dy = event.getY() - mCurrentPoint.y;
-                    translationImage(dx / getScaleSize(), dy / getScaleSize());
-                } else if(MODE == SCALE) {
-                    mEndDis = distance(event);
-                    if(mEndDis > 50f) {
-                        float scale = mEndDis / mStartDis;
-                        scaleImage(scale / getScaleSize(), mMiddlePoint.x, mMiddlePoint.y);
-                        isScale = true;
-                        isEnlarged = true;
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                MODE = 0;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                MODE = SCALE;
-                mStartDis = distance(event);
-                Log.d(TAG, "onTouchEvent:mStartDis =  " + mStartDis);
-                if(mStartDis > 50f) {
-                    mMiddlePoint = middle(event);
-                }
-                break;
-        }
-        adjustBounds();
-        if(mLeftAndTopPoint.x >= 0 || mRightAndBottomPoint.x <= mScreenWidth) {
-            getParent().requestDisallowInterceptTouchEvent(false);
-        }
+//        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+//            case MotionEvent.ACTION_DOWN:
+//                getParent().requestDisallowInterceptTouchEvent(true);
+//                MODE = TRANSLATION;
+//                mCurrentPoint.set(event.getX(), event.getY());
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                if(MODE == TRANSLATION && isEnlarged) {
+//                    float dx = event.getX() - mCurrentPoint.x;
+//                    float dy = event.getY() - mCurrentPoint.y;
+//                    translationImage(dx / getScaleSize(), dy / getScaleSize());
+//                } else if(MODE == SCALE) {
+//                    mEndDis = distance(event);
+//                    if(mEndDis > 50f) {
+//                        float scale = mEndDis / mStartDis;
+//                        scaleImage(scale / getScaleSize(), mMiddlePoint.x, mMiddlePoint.y);
+//                        isScale = true;
+//                        isEnlarged = true;
+//                    }
+//                }
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                break;
+//            case MotionEvent.ACTION_POINTER_UP:
+//                MODE = 0;
+//                break;
+//            case MotionEvent.ACTION_POINTER_DOWN:
+//                MODE = SCALE;
+//                mStartDis = distance(event);
+//                Log.d(TAG, "onTouchEvent:mStartDis =  " + mStartDis);
+//                if(mStartDis > 50f) {
+//                    mMiddlePoint = middle(event);
+//                }
+//                break;
+//        }
+//        adjustBounds();
+//        if(mLeftAndTopPoint.x >= 0 || mRightAndBottomPoint.x <= mScreenWidth) {
+//            getParent().requestDisallowInterceptTouchEvent(false);
+//        }
         return true;
     }
 
@@ -229,8 +230,7 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     private class SimpleListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            Log.d(TAG, "onDoubleTap: isEnlarged = " + isEnlarged);
-            Log.d(TAG, "onDoubleTap: " + 1.0f * mScreenHeight / mBitmapHeight);
+            Log.d(TAG, "onDoubleTap: ");
             if(! isEnlarged){ //双击放大
                 putCenter(1.0f * mScreenHeight / mBitmapHeight);
                 isEnlarged = !isEnlarged;
@@ -238,7 +238,6 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
                 putCenter(1.0f * mScreenWidth / mBitmapWidth);
                 isEnlarged = !isEnlarged;
             }
-            getParent().requestDisallowInterceptTouchEvent(false);
             return true;
         }
 

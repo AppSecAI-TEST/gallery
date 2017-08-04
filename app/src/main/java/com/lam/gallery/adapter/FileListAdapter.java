@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.db.MediaFile;
-import com.lam.gallery.manager.GalleryBitmapFactory;
+import com.lam.gallery.manager.GalleryBitmapManager;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -22,7 +22,7 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
 
     private List<MediaFile> mMediaFileList;
     private int mSelectedFilePos;
-    protected OnFileItemClickListener mOnFileItemClickListener;
+    private OnFileItemClickListener mOnFileItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
 
     public FileListAdapter(List<MediaFile> mediaFileList, int selectedFilePos) {
@@ -67,35 +67,33 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
             fileListViewHolder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
             fileListViewHolder.getFileSelect().setVisibility(View.VISIBLE);
         }
-        GalleryBitmapFactory.loadThumbnailWithTag(mMediaFileList.get(position).getFileCoverPath(), mMediaFileList.get(position).getCoverPathId(), fileCoverView, position);
-        if (holder != null) {
-            if (mOnFileItemClickListener != null)
-                holder.itemView.setOnClickListener(this);
-        }
+        GalleryBitmapManager.loadThumbnailWithTag(mMediaFileList.get(position).getFileCoverPath(), mMediaFileList.get(position).getCoverPathId(), fileCoverView, position);
+        if (mOnFileItemClickListener != null)
+            holder.itemView.setOnClickListener(this);
     }
 
-    public class FileListViewHolder extends RecyclerView.ViewHolder{
+    private class FileListViewHolder extends RecyclerView.ViewHolder{
         private ImageView fileCover;
         private TextView fileName;
         private TextView fileCount;
         private ImageView fileSelect;
-        public FileListViewHolder(View itemView) {
+        private FileListViewHolder(View itemView) {
             super(itemView);
             fileCover = (ImageView) itemView.findViewById(R.id.iv_file_cover);
             fileName = (TextView) itemView.findViewById(R.id.tv_file_name);
             fileCount = (TextView) itemView.findViewById(R.id.tv_file_count);
             fileSelect = (ImageView) itemView.findViewById(R.id.iv_file_select);
         }
-        public ImageView getFileCover() {
+        private ImageView getFileCover() {
             return fileCover;
         }
-        public TextView getFileName() {
+        private TextView getFileName() {
             return fileName;
         }
-        public TextView getFileCount() {
+        private TextView getFileCount() {
             return fileCount;
         }
-        public ImageView getFileSelect() {
+        private ImageView getFileSelect() {
             return fileSelect;
         }
     }

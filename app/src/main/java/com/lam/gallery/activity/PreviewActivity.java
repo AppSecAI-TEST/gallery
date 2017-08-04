@@ -110,7 +110,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = getIntent();
         mViewPagerCurrentPos = intent.getIntExtra(CLICK_POS, -1);
         final String fileName = intent.getStringExtra(PREVIEW_MEDIA_FILE_NAME);
-//        ThreadManager.clear();
         BitmapTaskDispatcher.clear();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override

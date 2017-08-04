@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.manager.GalleryBitmapFactory;
+import com.lam.gallery.manager.GalleryBitmapManager;
 import com.lam.gallery.ui.GridViewImageItem;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         gridViewImageItem.setTag(position);
         selectImage.setTag(position);
         //加载渲染ui
-        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
+        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
         String path = mMediaList.get(position).getPath();
         if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
             selectImage.setImageResource(R.drawable.select_green_16);
@@ -90,19 +90,19 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         return mMediaList == null ? 0 : mMediaList.size();
     }
 
-    public class GridViewHolder extends RecyclerView.ViewHolder {
+    private class GridViewHolder extends RecyclerView.ViewHolder {
         private GridViewImageItem mGridViewImageItem;
         private ImageView mImageView;
-        public GridViewHolder(View itemView) {
+        private GridViewHolder(View itemView) {
             super(itemView);
             mGridViewImageItem = (GridViewImageItem) itemView.findViewById(R.id.gvi_media_image);
             mImageView = (ImageView)itemView.findViewById(R.id.iv_media_select);
         }
-        public GridViewImageItem getGridViewImageItem() {
+        private GridViewImageItem getGridViewImageItem() {
             return mGridViewImageItem;
         }
 
-        public ImageView getImageView() {
+        private ImageView getImageView() {
             return mImageView;
         }
     }
