@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -20,13 +21,13 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.R2;
-import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.adapter.FileListAdapter;
 import com.lam.gallery.adapter.MediaGridAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaFile;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
+import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.manager.ValueAnimatorManager;
 import com.lam.gallery.ui.UiManager;
 
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mRvFileList.setVisibility(View.VISIBLE);
         mViewFileListBackground.setVisibility(View.VISIBLE);
         int maxHeight = mRvGalleryGrid.getHeight() - mRlGalleryFooter.getHeight();
+        Log.d(TAG, "fileListAnimator: " + mRlGalleryFooter.getHeight());
         ValueAnimator fileListAnimator;
         ValueAnimator fileBackAnimator;
         if (mRvFileList.getHeight() == 0) {
@@ -268,5 +270,11 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         setIntent(intent);
         if(intent.getBooleanExtra(IS_FINISH_SELECT, false))
             finish();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        backToMain();
+        return true;
     }
 }

@@ -165,9 +165,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         UiManager.updateSelect(mPreviewMediaList.get(mViewPagerCurrentPos).getPath(), mIvFooterSelect);
     }
 
-    /**
-     * 点击图片header 和 footer 的动画
-     */
+    //点击图片header 和 footer 的动画
     private void headerAndFooterAnimator() {
         ValueAnimator headerAnimator;
         Animation alphaAnimation;
@@ -212,11 +210,11 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         if (v.getId() == R.id.iv_footer_origin || v.getId() == R.id.tv_footer_origin)
             UiManager.listenerUpdateOrigin(mIvFooterOrigin);
-        if (v.getId() == R.id.iv_title_left_point)   //反馈数据给上一个activity
+        else if (v.getId() == R.id.iv_title_left_point)   //反馈数据给上一个activity
             MainActivity.start(this, false);
-        if (v.getId() == R.id.bt_title_send && SelectedMedia.selectedMediaCount() != 0)  //反馈数据给上一个activity
+        else if (v.getId() == R.id.bt_title_send && SelectedMedia.selectedMediaCount() != 0)  //反馈数据给上一个activity
             MainActivity.start(this, true);
-        if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
+        else if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
             String clickPath = mPreviewMediaList.get(mViewPagerCurrentPos).getPath();
             int selectedPos = SelectedMedia.getSelectedPosition(clickPath);
             int posInMediaList = MediaManager.findPosByPath(mPreviewMediaList, clickPath);
@@ -275,7 +273,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public void onPageScrollStateChanged(int state) {
     }
 
-    //被选中的列表发生变更时更新ui
+    //被选中的列表有数据增加发生变更时更新ui
     @Override
     public void updateAddSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
