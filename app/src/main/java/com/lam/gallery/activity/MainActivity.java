@@ -27,8 +27,8 @@ import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaFile;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
-import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.manager.ValueAnimatorManager;
+import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.UiManager;
 
 import java.util.ArrayList;
@@ -110,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mGridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
         mLinearLayoutManager = new LinearLayoutManager(MainActivity.this);
         mHandler = new Handler();
-        ThreadManager.addTask(new Runnable() {
+        BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
-            public void run() {     //开启子线程加载数据
+            public void doTask() {
                 MediaManager mediaManager = new MediaManager();
                 mediaManager.findAllMedia(MainActivity.this);
             }
@@ -196,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //取消选择返回主module
     private void backToMain() {
-        ThreadManager.clear();
+//        ThreadManager.clear();
+        BitmapTaskDispatcher.clear();
         SelectedMedia.clearData();
         UiManager.setIsOriginMedia(false);
         finish();
@@ -229,15 +230,16 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mTvFooterFileName.setText(mMediaFileList.get(position).getFileName());
         mMediaGridAdapter.setMediaList(null);
         mMediaGridAdapter.notifyDataSetChanged();
-        ThreadManager.clear();
+//        ThreadManager.clear();
+        BitmapTaskDispatcher.clear();
         if(position == 0) {
             mMediaGridAdapter.setMediaList(mMediaList);
             mMediaGridAdapter.notifyDataSetChanged();
             mSelectMediaFileList = mMediaList;
         } else {
-            ThreadManager.addTask(new Runnable() {
+            BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
                 @Override
-                public void run() {
+                public void doTask() {
                     MediaManager mediaManager = new MediaManager();
                     mSelectMediaFileList = mediaManager.findMediaListByFileName(mMediaFileList.get(position).getFileName());
                     mHandler.post(new Runnable() {

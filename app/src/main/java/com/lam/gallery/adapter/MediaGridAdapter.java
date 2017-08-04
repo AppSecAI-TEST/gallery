@@ -54,6 +54,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         final GridViewImageItem gridViewImageItem = ((GridViewHolder) holder).getGridViewImageItem();
         //初始化
         selectImage.setImageResource(R.drawable.select_alpha_16);
+        gridViewImageItem.clearColorFilter();
         //设置标记setTag类
         gridViewImageItem.setTag(position);
         selectImage.setTag(position);

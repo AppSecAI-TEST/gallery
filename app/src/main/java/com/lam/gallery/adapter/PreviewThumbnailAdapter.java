@@ -38,7 +38,7 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (mRecyclerView == null)
-            mRecyclerView = new WeakReference<RecyclerView>((RecyclerView) parent);
+            mRecyclerView = new WeakReference<>((RecyclerView) parent);
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_preview_thumbnail, null);
         ThumbnailViewHolder holder = new ThumbnailViewHolder(view);
         //监听设置

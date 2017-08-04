@@ -55,8 +55,10 @@ public class PathShowAdapter extends RecyclerView.Adapter {
         final String path = mMediaList.get(position).getPath();
         if(mIsOrigin) {
             GalleryBitmapFactory.loadOriginBitmapWithTag(mMediaList.get(position).getPath(), imageView, position);
+//            BitmapTaskDispatcher.getLIFOTaskDispatcher().loadProcessBitmapWithTag(mMediaList.get(position).getPath(), imageView, position, 200);
         } else {
             GalleryBitmapFactory.loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
+//            BitmapTaskDispatcher.getLIFOTaskDispatcher().loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
         }
     }
 

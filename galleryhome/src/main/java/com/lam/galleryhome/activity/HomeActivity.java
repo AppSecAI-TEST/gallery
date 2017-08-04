@@ -9,11 +9,11 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.GetSelectedMedia;
-import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.activity.MainActivity;
 import com.lam.gallery.db.Media;
-import com.lam.galleryhome.adapter.PathShowAdapter;
+import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.galleryhome.R;
+import com.lam.galleryhome.adapter.PathShowAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,8 +86,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
-        ThreadManager.clear();
-        ThreadManager.shutDown();
+//        ThreadManager.clear();
+//        ThreadManager.shutDown();
+        BitmapTaskDispatcher.clear();
+        BitmapTaskDispatcher.shutDown();
         super.onDestroy();
     }
 }

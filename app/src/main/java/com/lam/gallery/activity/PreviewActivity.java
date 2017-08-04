@@ -19,13 +19,13 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.R2;
-import com.lam.gallery.manager.ThreadManager;
 import com.lam.gallery.adapter.PreviewThumbnailAdapter;
 import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
 import com.lam.gallery.manager.ValueAnimatorManager;
+import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.ToastUtil;
 import com.lam.gallery.ui.UiManager;
 
@@ -110,10 +110,11 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = getIntent();
         mViewPagerCurrentPos = intent.getIntExtra(CLICK_POS, -1);
         final String fileName = intent.getStringExtra(PREVIEW_MEDIA_FILE_NAME);
-        ThreadManager.clear();
-        ThreadManager.addTask(new Runnable() {
+//        ThreadManager.clear();
+        BitmapTaskDispatcher.clear();
+        BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
-            public void run() {
+            public void doTask() {
                 MediaManager mediaManager = new MediaManager();
                 if (fileName == null)    //通过点击预览进入
                     mPreviewMediaList = SelectedMedia.cloneSelectMediaList();
