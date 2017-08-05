@@ -1,4 +1,4 @@
-package com.lam.gallery;
+package com.lam.gallery.manager;
 
 import android.app.Application;
 import android.content.Context;

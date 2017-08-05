@@ -3,10 +3,8 @@ package com.lam.gallery.manager;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 
-import com.lam.gallery.GalleryApplication;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaFile;
 
@@ -25,7 +23,7 @@ public class MediaManager {
         MediaFile mediaFile = new MediaFile(0, "所有图片", null, 0);
         mediaFileList.add(mediaFile);
         Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, "date_added desc");
-        while(cursor.moveToNext()) {
+        while(cursor != null && cursor.moveToNext()) {
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             String fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
             int mediaId = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID));
@@ -56,7 +54,7 @@ public class MediaManager {
     public List<Media> findMediaListByFileName(String fileName) {
         List<Media> selectFileMediaList = new ArrayList<>();
         Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, "bucket_display_name = ?", new String[] {fileName}, "date_added desc");
-        while(cursor.moveToNext()) {
+        while(cursor != null && cursor.moveToNext()) {
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             int mediaId = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID));
             selectFileMediaList.add(new Media(mediaId, path));
@@ -69,7 +67,7 @@ public class MediaManager {
     public List<Media> findAllMedia() {
         List<Media> selectFileMediaList = new ArrayList<>();
         Cursor cursor = GalleryApplication.getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, "date_added desc");
-        while(cursor.moveToNext()) {
+        while(cursor != null && cursor.moveToNext()) {
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             int mediaId = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID));
             selectFileMediaList.add(new Media(mediaId, path));
@@ -82,28 +80,6 @@ public class MediaManager {
     public static Bitmap getThumbnail(int id) {
         ContentResolver resolver = GalleryApplication.getContext().getContentResolver();
         return MediaStore.Images.Thumbnails.getThumbnail(resolver, id, MediaStore.Images.Thumbnails.MINI_KIND, null);
-    }
-
-    public static Bitmap getCompressMedia(String path) {
-        BitmapFactory.Options newOpts = new BitmapFactory.Options();
-        newOpts.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, newOpts);
-        newOpts.inJustDecodeBounds = false;
-        int width = newOpts.outWidth;
-        int height = newOpts.outHeight;
-        float reqWidth = 768f;
-        float reqHeight = 1280f;
-        int inSampleSize = 1;
-        if (width > height && width > reqWidth) {
-            inSampleSize = Math.round(width /reqWidth);
-        } else if (width < height && height >reqHeight) {
-            inSampleSize = Math.round(height /reqHeight);
-        }
-        if (inSampleSize <= 0)
-            inSampleSize = 1;
-        newOpts.inSampleSize = inSampleSize;//设置采样率
-        newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        return BitmapFactory.decodeFile(path, newOpts);
     }
 
     public interface InitDataListener {

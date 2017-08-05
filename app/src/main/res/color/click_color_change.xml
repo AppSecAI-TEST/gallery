@@ -2,9 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_pressed="true"
-        android:drawable="@color/colorClick" />
+        android:color="@color/colorClick" />
 
     <item
         android:state_pressed="false"
-        android:drawable="@color/colorText" />
+        android:color="@color/colorText" />
 </selector>

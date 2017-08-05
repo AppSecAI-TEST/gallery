@@ -1,7 +1,7 @@
 package com.lam.gallery.ui;
 import android.widget.Toast;
 
-import com.lam.gallery.GalleryApplication;
+import com.lam.gallery.manager.GalleryApplication;
 
 public class ToastUtil {
 

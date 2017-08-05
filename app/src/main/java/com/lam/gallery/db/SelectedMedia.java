@@ -16,14 +16,27 @@ public class SelectedMedia {
     private static List<Media> selectedMediaList = new ArrayList<>();
     private static UpdateUi sUpdateUi;
 
+    /**
+     * 设置更新ui的监听器
+     * @param updateUi
+     */
     public static void setUpdateUi(UpdateUi updateUi) {
         sUpdateUi = updateUi;
     }
 
+    /**
+     * 获得被选中的图片列表
+     * @return List<Media>
+     */
     public static List<Media> getSelectedMediaList() {
         return selectedMediaList;
     }
 
+    /**
+     * 加入图片到列表
+     * @param selectMedia 被选择加入的Media对象
+     * @return
+     */
     public static boolean addSelected(Media selectMedia) {
         if(selectedMediaList.size() == 9) {
             ToastUtil.showToast("你最多只能选择9张图片");
@@ -40,10 +53,18 @@ public class SelectedMedia {
         }
     }
 
+    /**
+     * 获得已选图片的数量
+     * @return
+     */
     public static int selectedMediaCount() {
         return selectedMediaList.size();
     }
 
+    /**
+     * 通过Media对象在已选列表的position移除Media对象
+     * @param position Media对象在已选列表的位置position
+     */
     public static void removeByPosition(int position) {
         selectedMediaList.remove(position);
         if(sUpdateUi != null) {
@@ -52,6 +73,11 @@ public class SelectedMedia {
         Log.d(TAG, "removeByPosition: " + selectedMediaList.size());
     }
 
+    /**
+     * 通过Media对象的路径移除Media对象
+     * @param path 需移除的Media对象路径
+     * @return
+     */
     public static boolean removeByPath(String path) {
         for(int i = 0; i < selectedMediaList.size(); ++i) {
             if(selectedMediaList.get(i).getPath().equals(path)) {
@@ -64,6 +90,12 @@ public class SelectedMedia {
     }
 
     //查找路径对应的position，存在则返回position，否则返回-1
+
+    /**
+     * 通过获得Media对象的路径获得该对象在已选列表的位置position
+     * @param path Media对象路径
+     * @return
+     */
     public static int getSelectedPosition(String path) {
         int position = -1;
         for(int i = 0; i < selectedMediaList.size(); ++i) {
@@ -74,14 +106,9 @@ public class SelectedMedia {
         return position;
     }
 
-    public static List<Media> cloneSelectMediaList() {
-        List<Media> mediaList = new ArrayList<>();
-        for(int i = 0; i < selectedMediaList.size(); ++i) {
-            mediaList.add(selectedMediaList.get(i));
-        }
-        return mediaList;
-    }
-
+    /**
+     * 清除已选图片列表的数据
+     */
     public static void clearData() {
         selectedMediaList.clear();
     }

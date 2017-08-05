@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by lenovo on 2017/7/28.
  */
-
+@Deprecated
 public class ThreadManager {
     private static LinkedBlockingDeque<Runnable> mLinkedBlockingDeque;
     private static ExecutorService mExecutorService;

@@ -1,4 +1,4 @@
-package com.lam.gallery.manager;
+package com.lam.gallery.ui;
 
 import android.animation.ValueAnimator;
 import android.view.View;

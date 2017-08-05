@@ -30,7 +30,6 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:text="所有图片"
-        android:textStyle="bold"
         android:layout_centerVertical="true"
         android:layout_margin="10dp"
         android:textSize="20sp"

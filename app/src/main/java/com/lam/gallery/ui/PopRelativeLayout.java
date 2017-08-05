@@ -9,7 +9,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.R;
-import com.lam.gallery.manager.ValueAnimatorManager;
 
 /**
  * Created by lenovo on 2017/8/3.

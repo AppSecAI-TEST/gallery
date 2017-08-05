@@ -143,26 +143,4 @@ public class BitmapTaskDispatcher {
         public abstract void doTask();
     }
 
-//    @Override
-//    public void run() {
-//    try {
-//    final T t = doTask();
-//    new Handler(Looper.getMainLooper()).post(new Runnable() {
-//    @Override
-//    public void run() {
-//    finishTask(t);
-//    }
-//    })
-//    } catch (Exception e) {
-//    e.printStackTrace();
-//    } finally {
-//    mPollSemaphore.release();
-//    }
-//    }
-//
-//    public abstract T doTask();
-//    public void finishTask(T t) {
-//
-//    }
-
 }

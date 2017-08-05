@@ -24,7 +24,7 @@ import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
-import com.lam.gallery.manager.ValueAnimatorManager;
+import com.lam.gallery.ui.ValueAnimatorManager;
 import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.ToastUtil;
 import com.lam.gallery.ui.UiManager;
@@ -35,7 +35,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener, PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
+public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener,
+        PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
     private static final String TAG = "PreViewActivity";
     @BindView(R2.id.vp_preview)
     ViewPager mVpPreview;
@@ -116,7 +117,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             public void doTask() {
                 MediaManager mediaManager = new MediaManager();
                 if (fileName == null)    //通过点击预览进入
-                    mPreviewMediaList = SelectedMedia.cloneSelectMediaList();
+                    mPreviewMediaList.addAll(SelectedMedia.getSelectedMediaList());
                 else if (fileName.equals("所有图片"))
                     mPreviewMediaList = mediaManager.findAllMedia();
                 else
@@ -273,7 +274,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public void onPageScrollStateChanged(int state) {
     }
 
-    //被选中的列表有数据增加发生变更时更新ui
+    //被选中的列表有数据增加时更新ui
     @Override
     public void updateAddSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);
@@ -285,6 +286,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
 
+    //被选中的列表有数据减少时更新ui
     @Override
     public void updateRemoveSelectMediaUi() {
         UiManager.updateSendButton(mBtTitleSend);

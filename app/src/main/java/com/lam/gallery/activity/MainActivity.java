@@ -27,7 +27,7 @@ import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaFile;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
-import com.lam.gallery.manager.ValueAnimatorManager;
+import com.lam.gallery.ui.ValueAnimatorManager;
 import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.UiManager;
 
@@ -93,12 +93,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         setListener();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SelectedMedia.setUpdateUi(this);
-    }
-
     //数据的初始化
     private void init() {
         mSelectedFilePos = 0;
@@ -138,6 +132,30 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mTvFooterPreview.setOnClickListener(this);
     }
 
+    //文件选择列表出现动画
+    private void fileListAnimator() {
+        mFilesListAdapter.notifyDataSetChanged();
+        mRvFileList.setVisibility(View.VISIBLE);
+        mViewFileListBackground.setVisibility(View.VISIBLE);
+        int maxHeight = mRvGalleryGrid.getHeight() - mRlGalleryFooter.getHeight();
+        Log.d(TAG, "fileListAnimator: " + mRlGalleryFooter.getHeight());
+        ValueAnimator fileListAnimator;
+        ValueAnimator fileBackAnimator;
+        if (mRvFileList.getHeight() == 0) {
+            fileListAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mRvFileList);
+            fileBackAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mViewFileListBackground);
+            Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_alpha_to_translucent);
+            mViewFileListBackground.startAnimation(alphaAnimation);
+        } else {
+            fileListAnimator = ValueAnimatorManager.viewAnimator(mRvFileList.getLayoutParams().height, 0, 300, mRvFileList);
+            fileBackAnimator = ValueAnimatorManager.viewAnimator(mViewFileListBackground.getLayoutParams().height, 0, 300, mViewFileListBackground);
+            Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_translucent_to_alpha);
+            mViewFileListBackground.startAnimation(alphaAnimation);
+        }
+        fileListAnimator.start();
+        fileBackAnimator.start();
+    }
+
     @Override
     public void getData(List<Media> mediaList, final List<MediaFile> mediaFileList) {
         mMediaList = mediaList;
@@ -166,40 +184,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
             finish();
     }
 
-    /**
-     * 文件选择列表出现动画
-     */
-    private void fileListAnimator() {
-        mFilesListAdapter.notifyDataSetChanged();
-        mRvFileList.setVisibility(View.VISIBLE);
-        mViewFileListBackground.setVisibility(View.VISIBLE);
-        int maxHeight = mRvGalleryGrid.getHeight() - mRlGalleryFooter.getHeight();
-        Log.d(TAG, "fileListAnimator: " + mRlGalleryFooter.getHeight());
-        ValueAnimator fileListAnimator;
-        ValueAnimator fileBackAnimator;
-        if (mRvFileList.getHeight() == 0) {
-            fileListAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mRvFileList);
-            fileBackAnimator = ValueAnimatorManager.viewAnimator(0, maxHeight, 300, mViewFileListBackground);
-            Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_alpha_to_translucent);
-            mViewFileListBackground.startAnimation(alphaAnimation);
-        } else {
-            fileListAnimator = ValueAnimatorManager.viewAnimator(mRvFileList.getLayoutParams().height, 0, 300, mRvFileList);
-            fileBackAnimator = ValueAnimatorManager.viewAnimator(mViewFileListBackground.getLayoutParams().height, 0, 300, mViewFileListBackground);
-            Animation alphaAnimation = AnimationUtils.loadAnimation(this, R.anim.from_translucent_to_alpha);
-            mViewFileListBackground.startAnimation(alphaAnimation);
-        }
-        fileListAnimator.start();
-        fileBackAnimator.start();
-    }
-
-    //取消选择返回主module
-    private void backToMain() {
-        BitmapTaskDispatcher.clear();
-        SelectedMedia.clearData();
-        UiManager.setIsOriginMedia(false);
-        finish();
-    }
-
     @Override
     public void clickToIntent(int position) {
         PreviewActivity.start(this, position, mMediaFileList.get(mSelectedFilePos).getFileName());
@@ -217,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         UiManager.updateSendButton(mBtTitleSend);
     }
 
+    //文件选择监听
     @Override
     public void onFileItemClick(View view, final int position) {
         Log.d(TAG, "onFileItemClick: " + position);
@@ -249,6 +234,20 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         fileListAnimator();
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
+    }
+
+    //取消选择返回主module
+    private void backToMain() {
+        BitmapTaskDispatcher.clear();
+        SelectedMedia.clearData();
+        UiManager.setIsOriginMedia(false);
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SelectedMedia.setUpdateUi(this);
     }
 
     @Override
