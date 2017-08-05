@@ -101,7 +101,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         mRvPreviewThumbnail.setLayoutManager(mLinearLayoutManager);
         mLastThumbnailPos = -1;
         UiManager.updateSendButton(mBtTitleSend);
-        UiManager.updataOiginView(mIvFooterOrigin);
+        UiManager.updateOriginView(mIvFooterOrigin);
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
     }
 

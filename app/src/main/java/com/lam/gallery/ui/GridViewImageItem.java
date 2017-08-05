@@ -14,7 +14,7 @@ public class GridViewImageItem extends android.support.v7.widget.AppCompatImageV
     private static OnIntentToPreviewListener sOnIntentToPreviewListener;
     private GestureDetector mGestureDetector;
 
-    public static void setOnIntentToPreviewListener(OnIntentToPreviewListener onIntentToPreviewListener) {
+    public void setOnIntentToPreviewListener(OnIntentToPreviewListener onIntentToPreviewListener) {
         sOnIntentToPreviewListener = onIntentToPreviewListener;
     }
 

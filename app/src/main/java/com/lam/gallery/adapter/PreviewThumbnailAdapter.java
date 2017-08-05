@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.manager.GalleryBitmapManager;
+import com.lam.gallery.factory.GalleryBitmapFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -59,7 +59,7 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
+        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
     }
 
     private class ThumbnailViewHolder extends RecyclerView.ViewHolder {

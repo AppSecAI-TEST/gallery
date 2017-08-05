@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.manager.GalleryBitmapManager;
+import com.lam.gallery.factory.GalleryBitmapFactory;
 import com.lam.gallery.ui.GridViewImageItem;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         mMediaList = mediaList;
     }
 
-    public static void setOnClickToIntent(onClickToIntent onClickToIntent) {
+    public void setOnClickToIntent(onClickToIntent onClickToIntent) {
         sOnClickToIntent = onClickToIntent;
     }
 
@@ -64,7 +64,7 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
             selectImage.setImageResource(R.drawable.select_green_16);
             gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
-        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
+        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
         //设置监听
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override

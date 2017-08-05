@@ -1,7 +1,6 @@
 package com.lam.gallery.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
@@ -17,7 +16,7 @@ import android.view.MotionEvent;
 public class PreViewImageView extends android.support.v7.widget.AppCompatImageView {
     private static OnClickItemViewListener sOnClickItemViewListener;
 
-    public static void setOnClickItemViewListener(OnClickItemViewListener onClickItemViewListener) {
+    public void setOnClickItemViewListener(OnClickItemViewListener onClickItemViewListener) {
         sOnClickItemViewListener = onClickItemViewListener;
     }
 
@@ -59,20 +58,12 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     private static final String TAG = "PreViewImageView";
 
     @Override
-    public void setImageBitmap(Bitmap bm) {
-        mBitmapWidth = bm.getWidth();
-        mBitmapHeight = bm.getHeight();
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        mBitmapWidth = getDrawable().getIntrinsicWidth();
+        mBitmapHeight = getDrawable().getIntrinsicHeight();
         mScreenHeight = getHeight();
         mScreenWidth = getWidth();
         putCenter(1.0f * mScreenWidth / mBitmapWidth);
-        maxScale = (6.0f / 5.0f * mScreenHeight / mBitmapHeight);
-        super.setImageBitmap(bm);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mScreenHeight = getHeight();
-        mScreenWidth = getWidth();
         super.onLayout(changed, left, top, right, bottom);
     }
 

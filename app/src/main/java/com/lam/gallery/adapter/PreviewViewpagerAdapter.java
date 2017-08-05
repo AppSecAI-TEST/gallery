@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 
 import com.lam.gallery.R;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.manager.GalleryBitmapManager;
+import com.lam.gallery.factory.GalleryBitmapFactory;
 import com.lam.gallery.ui.PreViewImageView;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
     private List<Media> mMediaList;
     private static OnClickHeaderAndFooterChange sOnClickHeaderAndFooterChange;
 
-    public static void setOnClickHeaderAndFooterChange(OnClickHeaderAndFooterChange onClickHeaderAndFooterChange) {
+    public void setOnClickHeaderAndFooterChange(OnClickHeaderAndFooterChange onClickHeaderAndFooterChange) {
         sOnClickHeaderAndFooterChange = onClickHeaderAndFooterChange;
     }
 
@@ -35,7 +35,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        GalleryBitmapManager.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 720, 1080);
+        GalleryBitmapFactory.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), mediaImage, position);
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;

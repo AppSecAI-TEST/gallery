@@ -3,6 +3,7 @@ package com.lam.gallery.manager;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 
 import com.lam.gallery.GalleryApplication;
@@ -83,8 +84,30 @@ public class MediaManager {
         return MediaStore.Images.Thumbnails.getThumbnail(resolver, id, MediaStore.Images.Thumbnails.MINI_KIND, null);
     }
 
+    public static Bitmap getCompressMedia(String path) {
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        newOpts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, newOpts);
+        newOpts.inJustDecodeBounds = false;
+        int width = newOpts.outWidth;
+        int height = newOpts.outHeight;
+        float reqWidth = 768f;
+        float reqHeight = 1280f;
+        int inSampleSize = 1;
+        if (width > height && width > reqWidth) {
+            inSampleSize = Math.round(width /reqWidth);
+        } else if (width < height && height >reqHeight) {
+            inSampleSize = Math.round(height /reqHeight);
+        }
+        if (inSampleSize <= 0)
+            inSampleSize = 1;
+        newOpts.inSampleSize = inSampleSize;//设置采样率
+        newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        return BitmapFactory.decodeFile(path, newOpts);
+    }
+
     public interface InitDataListener {
-        void getData(List mediaList, List mediaFileList);
+        void getData(List<Media> mediaList, List<MediaFile> mediaFileList);
     }
 
     public static int findPosByPath(List<Media> mediaList, String path) {

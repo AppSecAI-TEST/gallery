@@ -72,8 +72,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     private List<Media> mMediaList;
     private List<MediaFile> mMediaFileList;
     private List<Media> mSelectMediaFileList;
-    private GridLayoutManager mGridLayoutManager;
-    private LinearLayoutManager mLinearLayoutManager;
     private MediaGridAdapter mMediaGridAdapter;
     private FileListAdapter mFilesListAdapter;
     private Handler mHandler;
@@ -107,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mMediaList = new ArrayList<>();
         mMediaFileList = new ArrayList<>();
         mSelectMediaFileList = new ArrayList<>();
-        mGridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
-        mLinearLayoutManager = new LinearLayoutManager(MainActivity.this);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
         mHandler = new Handler();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
@@ -120,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         //先加载空白的RecyclerView
         mMediaGridAdapter = new MediaGridAdapter(mMediaList);
         mMediaGridAdapter.setOnClickToIntent(this);
-        mRvGalleryGrid.setLayoutManager(mGridLayoutManager);
+        mRvGalleryGrid.setLayoutManager(gridLayoutManager);
         mRvGalleryGrid.setAdapter(mMediaGridAdapter);
         mFilesListAdapter = new FileListAdapter(mMediaFileList, mSelectedFilePos);
         mFilesListAdapter.setOnFileItemClickListener(this);
-        mRvFileList.setLayoutManager(mLinearLayoutManager);
+        mRvFileList.setLayoutManager(linearLayoutManager);
         mRvFileList.setAdapter(mFilesListAdapter);
     }
 
@@ -141,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     }
 
     @Override
-    public void getData(List mediaList, final List mediaFileList) {
+    public void getData(List<Media> mediaList, final List<MediaFile> mediaFileList) {
         mMediaList = mediaList;
         mMediaFileList = mediaFileList;
         mHandler.post(new Runnable() {
@@ -256,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     @Override
     protected void onRestart() {
         super.onRestart();
-        UiManager.updataOiginView(mIvFooterOrigin);
+        UiManager.updateOriginView(mIvFooterOrigin);
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
         mMediaGridAdapter.notifyDataSetChanged();

@@ -31,7 +31,7 @@ public class BitmapTaskDispatcher {
 
     public static final int LIFO = 1;
     public static final int FIFO = 2;
-    public static final int DEFAULT_PERMITS_SIZE = 5;
+    public static final int DEFAULT_PERMITS_SIZE = Runtime.getRuntime().availableProcessors();
     public static final int DISPATCHER = 0X852;
 
     public BitmapTaskDispatcher(int permitSize, int type) {
@@ -109,7 +109,7 @@ public class BitmapTaskDispatcher {
      * 添加一个runnable到任务调度队列
      * @param runnable
      */
-    public static synchronized void addTask(TaskRunnable runnable) {
+    public synchronized void addTask(TaskRunnable runnable) {
         mRunnableLinkedList.add(runnable);
         mPollHandler.sendEmptyMessage(DISPATCHER);
     }
@@ -142,4 +142,27 @@ public class BitmapTaskDispatcher {
 
         public abstract void doTask();
     }
+
+//    @Override
+//    public void run() {
+//    try {
+//    final T t = doTask();
+//    new Handler(Looper.getMainLooper()).post(new Runnable() {
+//    @Override
+//    public void run() {
+//    finishTask(t);
+//    }
+//    })
+//    } catch (Exception e) {
+//    e.printStackTrace();
+//    } finally {
+//    mPollSemaphore.release();
+//    }
+//    }
+//
+//    public abstract T doTask();
+//    public void finishTask(T t) {
+//
+//    }
+
 }
