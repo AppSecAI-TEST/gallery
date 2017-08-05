@@ -204,20 +204,17 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     @Override
     public void clickToIntent(int position) {
-        Log.d(TAG, "clickToIntent: ");
         PreviewActivity.start(this, position, mMediaFileList.get(mSelectedFilePos).getFileName());
     }
 
     @Override
     public void updateAddSelectMediaUi() {
-        Log.d(TAG, "updateAddSelectMediaUi: ");
         UiManager.updatePreViewText(mTvFooterPreview);
         UiManager.updateSendButton(mBtTitleSend);
     }
 
     @Override
     public void updateRemoveSelectMediaUi() {
-        Log.d(TAG, "updateRemoveSelectMediaUi: ");
         UiManager.updatePreViewText(mTvFooterPreview);
         UiManager.updateSendButton(mBtTitleSend);
     }

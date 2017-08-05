@@ -77,15 +77,15 @@ public class GalleryBitmapManager {
         }
     }
 
-    public static void loadProcessBitmapWithTag(final String path, final ImageView imageView, final Object tag, final int reqSize) {
-        final String lruCacheKey = reqSize + reqSize + path;
+    public static void loadProcessBitmapWithTag(final String path, final ImageView imageView, final Object tag, final int reqWidth, final int reqHeight) {
+        final String lruCacheKey = reqWidth + reqHeight + path;
         Bitmap bitmap = GalleryFactory.getBitmap(GalleryFactory.LOAD_LRU_CACHE).loadBitmap(lruCacheKey);
         if(bitmap == null) {
             imageView.setImageResource(R.drawable.loading);
             BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
                 @Override
                 public void doTask() {
-                    final Bitmap bitmap = GalleryFactory.getBitmap(GalleryFactory.LOAD_PROCESS).loadBitmap(path, reqSize, reqSize);
+                    final Bitmap bitmap = GalleryFactory.getBitmap(GalleryFactory.LOAD_PROCESS).loadBitmap(path, reqWidth, reqHeight);
                     LruCacheManager.addBitmapToCache(lruCacheKey, bitmap);
                     getHandler().post(new Runnable() {
                         @Override
@@ -101,5 +101,4 @@ public class GalleryBitmapManager {
             imageView.setImageBitmap(bitmap);
         }
     }
-
 }

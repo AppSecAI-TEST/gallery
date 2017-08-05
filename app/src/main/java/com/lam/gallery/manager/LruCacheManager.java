@@ -12,17 +12,19 @@ public class LruCacheManager {
     private static final String TAG = "LruCacheManager";
     private volatile static LruCache<String, Bitmap> mLruCache;
 
-    public static LruCache<String, Bitmap> getLruCache() {
+    private static LruCache<String, Bitmap> getLruCache() {
         if(mLruCache == null) {
             synchronized (LruCache.class) {
-                int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-                int cacheSize = maxMemory / 8;
-                mLruCache = new LruCache<String, Bitmap>(cacheSize) {
-                    @Override
-                    protected int sizeOf(String key, Bitmap value) {
-                        return value.getByteCount() / 1024;
-                    }
-                };
+                if(mLruCache == null) {
+                    int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+                    int cacheSize = maxMemory / 4;
+                    mLruCache = new LruCache<String, Bitmap>(cacheSize) {
+                        @Override
+                        protected int sizeOf(String key, Bitmap value) {
+                            return value.getByteCount() / 1024;
+                        }
+                    };
+                }
             }
         }
         Log.d(TAG, "getLruCache: " + mLruCache);

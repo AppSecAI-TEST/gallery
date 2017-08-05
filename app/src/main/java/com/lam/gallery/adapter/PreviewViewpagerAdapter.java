@@ -35,7 +35,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        GalleryBitmapManager.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 200);
+        GalleryBitmapManager.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mediaImage, position, 720, 1080);
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;
@@ -53,6 +53,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        container.removeView((View) object);
     }
 
     @Override

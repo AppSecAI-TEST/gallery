@@ -59,12 +59,12 @@ public class MediaGridAdapter extends RecyclerView.Adapter implements GridViewIm
         gridViewImageItem.setTag(position);
         selectImage.setTag(position);
         //加载渲染ui
-        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
         String path = mMediaList.get(position).getPath();
         if(SelectedMedia.getSelectedPosition(path) != -1 && (int)gridViewImageItem.getTag() == position) { //该图片在已选集合中
             selectImage.setImageResource(R.drawable.select_green_16);
             gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
+        GalleryBitmapManager.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), gridViewImageItem, position);
         //设置监听
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override

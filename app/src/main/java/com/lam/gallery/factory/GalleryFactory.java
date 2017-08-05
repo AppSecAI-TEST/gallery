@@ -1,14 +1,5 @@
 package com.lam.gallery.factory;
 
-import android.graphics.Bitmap;
-import android.widget.ImageView;
-
-import com.lam.gallery.manager.LruCacheManager;
-
-/**
- * Created by lenovo on 2017/8/4.
- */
-
 public class GalleryFactory {
     public static final int LOAD_LRU_CACHE = 0;
     public static final int LOAD_ORIGIN = 1;
@@ -28,21 +19,4 @@ public class GalleryFactory {
         return null;
     }
 
-    public static void cacheBitmap(String key, Bitmap bitmap) {
-        LruCacheManager.addBitmapToCache(key, bitmap);
-    }
-
-    public static void setBitmapInView(ImageView view, Bitmap bitmap) {
-        view.setImageBitmap(bitmap);
-    }
-
-    public static void setBitmapWithTagInView(ImageView view, Bitmap bitmap, Object tag) {
-        if(bitmap != null && (int)view.getTag() == (int)tag) {
-            view.setImageBitmap(bitmap);
-        }
-    }
-
-    public interface GalleryBitmap {
-        Bitmap loadBitmap(Object... params);
-    }
 }

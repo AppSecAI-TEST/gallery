@@ -1,7 +1,7 @@
 package com.lam.galleryhome.activity;
 
+import android.Manifest;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 
 //import android.view.View;
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, GetSelectedMedia.GetSelectMediaListener {
+public class HomeActivity extends PermissionActivity implements View.OnClickListener, GetSelectedMedia.GetSelectMediaListener {
     private static final String TAG = "HomeActivity";
     @BindView(R.id.bt_select_picture)
     Button mBtSelectPicture;
@@ -63,8 +63,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.bt_select_picture)
-            MainActivity.start(this, false);
-        if(v.getId() == R.id.bt_clear_select) {
+            requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0x963);
+        else if(v.getId() == R.id.bt_clear_select) {
             mSelectedMediaList.clear();
             mIsOrigin = false;
             mPathShowAdapter.setMediaList(mSelectedMediaList);
@@ -86,5 +86,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void permissionSuccess(int requestCode) {
+        super.permissionSuccess(requestCode);
+        MainActivity.start(this, false);
     }
 }
