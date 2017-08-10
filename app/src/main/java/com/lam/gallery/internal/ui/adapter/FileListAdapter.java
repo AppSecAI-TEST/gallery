@@ -64,7 +64,7 @@ public class FileListAdapter extends BaseRecyclerViewAdapter<FileListAdapter.Fil
                 position, mMediaFileList.get(position).getCoverPathId());
     }
 
-    public class FileListViewHolder extends RecyclerView.ViewHolder{
+    class FileListViewHolder extends RecyclerView.ViewHolder{
         private ImageView fileCover;
         private TextView fileName;
         private TextView fileCount;

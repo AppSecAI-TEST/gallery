@@ -1,4 +1,4 @@
-package com.lam.gallery.internal.ui.ui;
+package com.lam.gallery.internal.ui.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

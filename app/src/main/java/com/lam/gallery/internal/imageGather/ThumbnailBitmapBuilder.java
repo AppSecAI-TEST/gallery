@@ -7,17 +7,17 @@ import com.lam.gallery.internal.manager.LruCacheManager;
 import com.lam.gallery.internal.manager.MediaManager;
 
 
-public class ThumbnailBitmapBuilder extends ImageBuilder {
+class ThumbnailBitmapBuilder extends ImageBuilder {
     @Override
-    public Bitmap loadBitmap(Object... params) {
-        Bitmap bitmap = MediaManager.getThumbnail((int) params[0]);
-        LruCacheManager.addBitmapToCache(params[0] + "", bitmap);
+    public Bitmap loadBitmap(Object params) {
+        Bitmap bitmap = MediaManager.getThumbnail((int) params);
+        LruCacheManager.addBitmapToCache(params + "", bitmap);
         Log.d("ImageGather", "loadBitmap: ThumbnailBitmapBuilder" + bitmap);
         return bitmap;
     }
 
     @Override
-    public boolean canHandleBuilder(Object... params) {
-        return (params[0] instanceof Integer);
+    public boolean canHandleBuilder(Object params) {
+        return (params instanceof Integer);
     }
 }

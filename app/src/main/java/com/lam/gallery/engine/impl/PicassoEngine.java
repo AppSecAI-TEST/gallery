@@ -43,9 +43,4 @@ public class PicassoEngine implements ImageEngine {
     public void loadImage(WeakReference<ImageView> imageViewWeakReference, Object tag, Object params) {
 
     }
-
-    public static int dip2px(float dipValue) {
-        final float scale = GalleryApplication.getContext().getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
-    }
 }

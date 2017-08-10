@@ -26,8 +26,8 @@ import com.lam.gallery.internal.entity.SelectedMedia;
 import com.lam.gallery.internal.manager.MediaManager;
 import com.lam.gallery.internal.task.BitmapTaskDispatcher;
 import com.lam.gallery.internal.utils.ToastUtil;
-import com.lam.gallery.internal.ui.ui.UiManager;
-import com.lam.gallery.internal.ui.ui.ValueAnimatorManager;
+import com.lam.gallery.internal.ui.view.UiManager;
+import com.lam.gallery.internal.ui.view.ValueAnimatorManager;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

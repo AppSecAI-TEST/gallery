@@ -1,10 +1,10 @@
 package com.lam.gallery.engine.impl;
 
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.engine.ImageEngine;
+import com.lam.gallery.internal.entity.ConfigSpec;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -22,15 +22,13 @@ public class ImageLoaderEngine implements ImageEngine {
     public ImageLoaderEngine() {
         mOptions = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.loading)
-                .cacheInMemory(true)
-//                .bitmapConfig(Bitmap.Config.ARGB_8888)
+                .cacheInMemory(ConfigSpec.getInstance().mCache)
                 .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
                 .build();
     }
 
     @Override
     public void loadThumbnail(WeakReference<ImageView> imageViewWeakReference, Object tag, Object params) {
-        Log.d(TAG, "loadThumbnail: " );
         ImageLoader.getInstance().displayImage(CONTENT_URI_HEAD + params, imageViewWeakReference.get(), mOptions);
     }
 

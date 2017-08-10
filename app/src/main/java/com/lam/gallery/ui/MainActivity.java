@@ -27,8 +27,8 @@ import com.lam.gallery.internal.entity.SelectedMedia;
 import com.lam.gallery.internal.ui.PreviewActivity;
 import com.lam.gallery.internal.ui.adapter.FileListAdapter;
 import com.lam.gallery.internal.ui.adapter.MediaGridAdapter;
-import com.lam.gallery.internal.ui.ui.UiManager;
-import com.lam.gallery.internal.ui.ui.ValueAnimatorManager;
+import com.lam.gallery.internal.ui.view.UiManager;
+import com.lam.gallery.internal.ui.view.ValueAnimatorManager;
 import com.lam.gallery.internal.manager.MediaManager;
 import com.lam.gallery.internal.task.BitmapTaskDispatcher;
 

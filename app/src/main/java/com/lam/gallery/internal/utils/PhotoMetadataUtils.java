@@ -27,11 +27,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static android.graphics.BitmapFactory.decodeFile;
+
 public final class PhotoMetadataUtils {
     private static final String TAG = PhotoMetadataUtils.class.getSimpleName();
     private static final int MAX_WIDTH = 1600;
 
-    public static Point getBitmapSize(Uri uri, Activity activity) {
+    public static Point getBitmapPoint(Uri uri, Activity activity) {
         ContentResolver resolver = activity.getContentResolver();
         Point imageSize = getBitmapBound(resolver, uri);
         int w = imageSize.x;
@@ -70,6 +72,16 @@ public final class PhotoMetadataUtils {
                 }
             }
         }
+    }
+
+    public static long getBitmapSize(String path) {
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        newOpts.inJustDecodeBounds = true;
+        decodeFile(path, newOpts);
+        newOpts.inJustDecodeBounds = false;
+        int width = newOpts.outWidth;
+        int height = newOpts.outHeight;
+        return width * height * 8;
     }
 
 }

@@ -69,6 +69,11 @@ public final class ConfigCreator {
         return this;
     }
 
+    public ConfigCreator maxBitmapSize(int size) {
+        mConfigSpec.mMaxBitmapSize = size * mConfigSpec.K * mConfigSpec.K;
+        return this;
+    }
+
     public void forResult(int requestCode) {
         Activity activity = mGallery.getActivity();
         if(activity == null) {

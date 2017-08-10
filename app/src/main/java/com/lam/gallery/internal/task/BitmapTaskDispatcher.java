@@ -31,12 +31,12 @@ public class BitmapTaskDispatcher {
     private static volatile Semaphore mPollSemaphore;
     private int mType;
 
-    public static final int LIFO = 1;
-    public static final int FIFO = 2;
-    public static final int DEFAULT_PERMITS_SIZE = ConfigSpec.getInstance().mSemaphoreSubmitSize;
-    public static final int DISPATCHER = 0X852;
+    private static final int LIFO = 1;
+    private static final int FIFO = 2;
+    private static final int DEFAULT_PERMITS_SIZE = ConfigSpec.getInstance().mSemaphoreSubmitSize;
+    private static final int DISPATCHER = 0X852;
 
-    public BitmapTaskDispatcher(int permitSize, int type) {
+    private BitmapTaskDispatcher(int permitSize, int type) {
         init(permitSize, type);
     }
 

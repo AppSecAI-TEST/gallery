@@ -55,7 +55,7 @@ public class PreviewThumbnailAdapter extends BaseRecyclerViewAdapter<PreviewThum
         ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
     }
 
-    public class ThumbnailViewHolder extends RecyclerView.ViewHolder {
+    class ThumbnailViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout mSelectedView ;
         private ImageView mThumbnailImage;
         private ThumbnailViewHolder(View itemView) {

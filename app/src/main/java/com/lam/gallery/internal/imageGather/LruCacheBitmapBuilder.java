@@ -5,15 +5,15 @@ import android.graphics.Bitmap;
 import com.lam.gallery.internal.manager.LruCacheManager;
 
 
-public class LruCacheBitmapBuilder extends ImageBuilder {
+class LruCacheBitmapBuilder extends ImageBuilder {
 
     @Override
-    public Bitmap loadBitmap(Object... params) {
-        return LruCacheManager.getBitmapFromCache(params[0] + "");
+    public Bitmap loadBitmap(Object params) {
+        return LruCacheManager.getBitmapFromCache(params + "");
     }
 
     @Override
-    public boolean canHandleBuilder(Object... params) {
-        return LruCacheManager.getBitmapFromCache(params[0] + "") != null;
+    public boolean canHandleBuilder(Object params) {
+        return LruCacheManager.getBitmapFromCache(params + "") != null;
     }
 }

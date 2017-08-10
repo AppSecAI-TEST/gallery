@@ -7,10 +7,10 @@ import com.lam.gallery.R;
 import com.lam.gallery.internal.GalleryApplication;
 
 
-public abstract class ImageBuilder {
+abstract class ImageBuilder {
     private ImageBuilder mNextImageBuilder;
 
-    public final Bitmap builder(Object... params) {
+    final Bitmap builder(Object params) {
         Bitmap bitmap = loadBitmap(params);
         if(bitmap != null) {
             return bitmap;
@@ -27,7 +27,7 @@ public abstract class ImageBuilder {
         this.mNextImageBuilder = nextImageBuilder;
     }
 
-    public abstract Bitmap loadBitmap(Object... params);
+    public abstract Bitmap loadBitmap(Object params);
 
-    public abstract boolean canHandleBuilder(Object... params);
+    public abstract boolean canHandleBuilder(Object params);
 }

@@ -4,10 +4,11 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.ImageView;
 
+import com.lam.gallery.R;
 import com.lam.gallery.internal.GalleryApplication;
+import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.internal.task.BitmapTaskDispatcher;
 
 import java.lang.ref.WeakReference;
@@ -51,8 +52,10 @@ public class ImageGather {
 
     private ImageGather() {
         List<ImageBuilder> imageBuilders = new ArrayList<>();
-        imageBuilders.add(new LruCacheBitmapBuilder());
+        if(ConfigSpec.getInstance().mCache)
+            imageBuilders.add(new LruCacheBitmapBuilder());
         imageBuilders.add(new ThumbnailBitmapBuilder());
+        imageBuilders.add(new OriginBitmapBuilder());
         imageBuilders.add(new ProcessBitmapBuilder());
         mImageBuilders = new ArrayList<>(imageBuilders);
     }
@@ -61,9 +64,8 @@ public class ImageGather {
         if(! (Looper.getMainLooper().getThread() == Thread.currentThread())) {
             throw new IllegalStateException("ImageGather.into() should run in main thread.");
         }
-//        Log.d(TAG, "into: " + new LruCacheBitmapBuilder().loadBitmap(params));
-//        if(new LruCacheBitmapBuilder().loadBitmap(params) == null)
-//            imageViewWeakReference.get().setImageResource(R.drawable.loading);
+        if(ConfigSpec.getInstance().mCache && new LruCacheBitmapBuilder().loadBitmap(params) == null)
+            imageViewWeakReference.get().setImageResource(R.drawable.loading);
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
             public Object doTask() {
@@ -87,7 +89,6 @@ public class ImageGather {
     private ImageBuilder forRequest(Object params) {
         List<ImageBuilder> imageBuilders = sImageGather.getImageBuilders();
         for(int i = 0; i < imageBuilders.size(); ++i) {
-            Log.d(TAG, "forRequest: " + i);
             ImageBuilder imageBuilder = imageBuilders.get(i);
             if(imageBuilder.canHandleBuilder(params)) {
                 return imageBuilder;

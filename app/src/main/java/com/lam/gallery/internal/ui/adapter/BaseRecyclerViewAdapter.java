@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
  */
 
 public abstract class BaseRecyclerViewAdapter <T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T> implements View.OnClickListener {
-    protected OnItemClickListener mOnItemClickListener;
+    OnItemClickListener mOnItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
 
 

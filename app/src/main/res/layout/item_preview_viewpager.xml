@@ -4,7 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <com.lam.gallery.internal.ui.ui.PreViewImageView
+    <com.lam.gallery.internal.ui.view.PreViewImageView
         android:id="@+id/pr_preview_media"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

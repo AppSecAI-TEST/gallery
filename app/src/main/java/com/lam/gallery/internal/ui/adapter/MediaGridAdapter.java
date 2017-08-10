@@ -12,7 +12,7 @@ import com.lam.gallery.R;
 import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.internal.entity.Media;
 import com.lam.gallery.internal.entity.SelectedMedia;
-import com.lam.gallery.internal.ui.ui.GridViewImageItem;
+import com.lam.gallery.internal.ui.view.GridViewImageItem;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

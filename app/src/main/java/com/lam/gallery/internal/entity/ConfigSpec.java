@@ -18,6 +18,8 @@ public final class ConfigSpec {
     public boolean mCache;
     public int mResizeX;
     public int mResizeY;
+    public long mMaxBitmapSize;
+    public final int K = 1024;
 
     private ConfigSpec() {
     }
@@ -42,6 +44,7 @@ public final class ConfigSpec {
         mCache = true;
         mResizeX = 320;
         mResizeY = 320;
+        mMaxBitmapSize = 2 * K * K;
     }
 
     private static final class InstanceHolder {

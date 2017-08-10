@@ -8,14 +8,14 @@ import com.lam.gallery.internal.GalleryApplication;
 
 
 
-public class EmptyBuilder extends ImageBuilder {
+class EmptyBuilder extends ImageBuilder {
     @Override
-    public Bitmap loadBitmap(Object... params) {
+    public Bitmap loadBitmap(Object params) {
         return BitmapFactory.decodeResource(GalleryApplication.getContext().getResources(), R.drawable.loading);
     }
 
     @Override
-    public boolean canHandleBuilder(Object... params) {
+    public boolean canHandleBuilder(Object params) {
         return true;
     }
 }

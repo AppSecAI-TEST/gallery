@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.lam.gallery.R;
 import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.internal.entity.Media;
-import com.lam.gallery.internal.ui.ui.PreViewImageView;
+import com.lam.gallery.internal.ui.view.PreViewImageView;
 import com.lam.gallery.internal.utils.PhotoMetadataUtils;
 
 import java.lang.ref.WeakReference;
@@ -45,7 +45,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        Point size = PhotoMetadataUtils.getBitmapSize(Uri.parse("file://" + mMediaList.get(position).getPath()), mActivityWeakReference.get());
+        Point size = PhotoMetadataUtils.getBitmapPoint(Uri.parse("file://" + mMediaList.get(position).getPath()), mActivityWeakReference.get());
         ConfigSpec.getInstance().mImageEngine.loadProcessImage(new WeakReference<ImageView>(mediaImage), size.x, size.y, position, mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId());
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);

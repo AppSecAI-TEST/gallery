@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
     android:padding="2dp">
 
-    <com.lam.gallery.internal.ui.ui.GridViewImageItem
+    <com.lam.gallery.internal.ui.view.GridViewImageItem
         android:id="@+id/gvi_media_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

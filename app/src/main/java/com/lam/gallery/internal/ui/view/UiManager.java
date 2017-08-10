@@ -1,4 +1,4 @@
-package com.lam.gallery.internal.ui.ui;
+package com.lam.gallery.internal.ui.view;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -10,11 +10,7 @@ import android.widget.TextView;
 
 import com.lam.gallery.R;
 import com.lam.gallery.internal.entity.ConfigSpec;
-import com.lam.gallery.internal.entity.Media;
 import com.lam.gallery.internal.entity.SelectedMedia;
-import com.lam.gallery.internal.manager.MediaManager;
-
-import java.util.List;
 
 /**
  * Created by lenovo on 2017/8/1.
@@ -75,16 +71,6 @@ public class UiManager {
             rvPreviewThumbnail.setVisibility(View.GONE);
         else
             rvPreviewThumbnail.setVisibility(View.VISIBLE);
-    }
-
-    public static void updateSelectListener(String clickPath, List<Media> mediaList, ImageView imageView) {
-        int selectedPos = SelectedMedia.getSelectedPosition(clickPath);
-        int posInMediaList = MediaManager.findPosByPath(mediaList, clickPath);
-        if(selectedPos == -1) {   //当点击的图片尚未被选中
-            SelectedMedia.addSelected(mediaList.get(posInMediaList));
-        } else {   //当点击的图片原为选中的图片
-            SelectedMedia.removeByPosition(selectedPos);
-        }
     }
 
     public static void updateSelect(String clickPath, ImageView imageView) {
