@@ -19,10 +19,8 @@ import java.util.List;
  * Created by lenovo on 2017/8/2.
  */
 
-public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+public class PreviewThumbnailAdapter extends BaseRecyclerViewAdapter<PreviewThumbnailAdapter.ThumbnailViewHolder> implements View.OnClickListener {
     private static final String TAG = "PreviewThumbnailAdapter";
-    private OnThumbnailItemClickListener mOnThumbnailItemClickListener;
-    private WeakReference<RecyclerView> mRecyclerView;
     private int mCurrentPos;
     private List<Media> mMediaList;
 
@@ -36,20 +34,15 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (mRecyclerView == null)
-            mRecyclerView = new WeakReference<>((RecyclerView) parent);
+    public ThumbnailViewHolder onCreateVH(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_preview_thumbnail, null);
         ThumbnailViewHolder holder = new ThumbnailViewHolder(view);
-        //监听设置
-        if (mOnThumbnailItemClickListener != null)
-            holder.itemView.setOnClickListener(this);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        ThumbnailViewHolder thumbnailViewHolder = (ThumbnailViewHolder) holder;
+    public void onBindVH(ThumbnailViewHolder holder, int position) {
+        ThumbnailViewHolder thumbnailViewHolder = holder;
         final ImageView thumbnailImage = thumbnailViewHolder.getThumbnailImage();
         RelativeLayout selectedView = thumbnailViewHolder.getSelectedView();
         //初始化
@@ -59,14 +52,10 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-
-//        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
-//        new ImageGather(ImageGather.LOAD_TYPE_THUMBNAIL).into(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
-//        ImageGather.with().into(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
         ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
     }
 
-    private class ThumbnailViewHolder extends RecyclerView.ViewHolder {
+    public class ThumbnailViewHolder extends RecyclerView.ViewHolder {
         private RelativeLayout mSelectedView ;
         private ImageView mThumbnailImage;
         private ThumbnailViewHolder(View itemView) {
@@ -87,20 +76,4 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         return mMediaList == null ? 0 : mMediaList.size();
     }
 
-    public void setOnThumbnailItemClickListener(OnThumbnailItemClickListener listener) {
-        mOnThumbnailItemClickListener = listener;
-    }
-
-    @Override
-    public void onClick(View v) {
-        RecyclerView recyclerView = mRecyclerView.get();
-        if (recyclerView != null) {
-            int position = recyclerView.getChildAdapterPosition(v);
-            mOnThumbnailItemClickListener.onThumbnailItemClick(v, position);
-        }
-    }
-
-    public interface OnThumbnailItemClickListener {
-        void onThumbnailItemClick(View view, int position);
-    }
 }

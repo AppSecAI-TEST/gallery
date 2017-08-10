@@ -18,20 +18,14 @@ import java.util.List;
  * Created by lenovo on 2017/8/1.
  */
 
-public class FileListAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+public class FileListAdapter extends BaseRecyclerViewAdapter<FileListAdapter.FileListViewHolder> implements View.OnClickListener {
 
     private List<MediaFile> mMediaFileList;
     private int mSelectedFilePos;
-    private OnFileItemClickListener mOnFileItemClickListener;
-    private WeakReference<RecyclerView> mRecyclerView;
 
     public FileListAdapter(List<MediaFile> mediaFileList, int selectedFilePos) {
         mMediaFileList = mediaFileList;
         mSelectedFilePos = selectedFilePos;
-    }
-
-    public void setOnFileItemClickListener(OnFileItemClickListener listener) {
-        mOnFileItemClickListener = listener;
     }
 
     public void setMediaFileList(List<MediaFile> mediaFileList) {
@@ -43,37 +37,34 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (mRecyclerView == null)
-            mRecyclerView = new WeakReference<>((RecyclerView) parent);
+    public FileListViewHolder onCreateVH(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, null);
         FileListViewHolder fileListViewHolder = new FileListViewHolder(view);
-        if (mOnFileItemClickListener != null)
+        if (mOnItemClickListener != null)
             fileListViewHolder.itemView.setOnClickListener(this);
         return fileListViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        final FileListViewHolder fileListViewHolder = (FileListViewHolder) holder;
-        ImageView fileNameSelectedView = fileListViewHolder.getFileSelect();
-        final ImageView fileCoverView = fileListViewHolder.getFileCover();
+    public void onBindVH(FileListViewHolder holder, int position) {
+        ImageView fileNameSelectedView = holder.getFileSelect();
+        final ImageView fileCoverView = holder.getFileCover();
         //初始化类
         fileNameSelectedView.setVisibility(View.GONE);
         // 标记类
         fileCoverView.setTag(position);
         //渲染加载ui
-        fileListViewHolder.getFileName().setText(mMediaFileList.get(position).getFileName());
-        fileListViewHolder.getFileCount().setText(mMediaFileList.get(position).getCount() + "张");
+        holder.getFileName().setText(mMediaFileList.get(position).getFileName());
+        holder.getFileCount().setText(mMediaFileList.get(position).getCount() + "张");
         if(mSelectedFilePos == position) {
-            fileListViewHolder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
-            fileListViewHolder.getFileSelect().setVisibility(View.VISIBLE);
+            holder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
+            holder.getFileSelect().setVisibility(View.VISIBLE);
         }
         ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>(fileCoverView),
                 position, mMediaFileList.get(position).getCoverPathId());
     }
 
-    private class FileListViewHolder extends RecyclerView.ViewHolder{
+    public class FileListViewHolder extends RecyclerView.ViewHolder{
         private ImageView fileCover;
         private TextView fileName;
         private TextView fileCount;
@@ -102,19 +93,6 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
     @Override
     public int getItemCount() {
         return mMediaFileList == null? 0 : mMediaFileList.size();
-    }
-
-    @Override
-    public void onClick(View v) {
-        RecyclerView recyclerView = mRecyclerView.get();
-        if (recyclerView != null) {
-            int position = recyclerView.getChildAdapterPosition(v);
-            mOnFileItemClickListener.onFileItemClick(v, position);
-        }
-    }
-
-    public interface OnFileItemClickListener {
-        void onFileItemClick(View view, int position);
     }
 
 }

@@ -36,7 +36,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnThumbnailItemClickListener,
+public class PreviewActivity extends AppCompatActivity implements View.OnClickListener, PreviewThumbnailAdapter.OnItemClickListener,
         PreviewViewpagerAdapter.OnClickHeaderAndFooterChange, ViewPager.OnPageChangeListener, SelectedMedia.UpdateUi {
     private static final String TAG = "PreViewActivity";
     @BindView(R2.id.vp_preview)
@@ -154,7 +154,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             mTvHeaderTitle.setText((mViewPagerCurrentPos + 1) + "/" + mPreviewMediaList.size());
         }
         mRvPreviewThumbnail.setAdapter(mPreviewThumbnailAdapter);
-        mPreviewThumbnailAdapter.setOnThumbnailItemClickListener(PreviewActivity.this);
+        mPreviewThumbnailAdapter.setOnItemClickListener(PreviewActivity.this);
 
     }
 
@@ -233,7 +233,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onThumbnailItemClick(View view, int position) { //position获取点击的缩略图在已选列表的position
+    public void onItemClick(View view, int position) { //position获取点击的缩略图在已选列表的position
         String selectPath = SelectedMedia.getSelectedMediaList().get(position).getPath();
         int pos = MediaManager.findPosByPath(mPreviewMediaList, selectPath);
         if(pos != -1) {

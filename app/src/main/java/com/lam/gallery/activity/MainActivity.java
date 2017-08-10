@@ -38,7 +38,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MediaManager.InitDataListener, View.OnClickListener, MediaGridAdapter.onClickToIntent, SelectedMedia.UpdateUi, FileListAdapter.OnFileItemClickListener {
+public class MainActivity extends AppCompatActivity implements MediaManager.InitDataListener, View.OnClickListener, MediaGridAdapter.onClickToIntent, SelectedMedia.UpdateUi, FileListAdapter.OnItemClickListener {
 
     private static final String TAG = "MainActivity";
     @BindView(R2.id.iv_title_left_point)
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mRvGalleryGrid.setLayoutManager(gridLayoutManager);
         mRvGalleryGrid.setAdapter(mMediaGridAdapter);
         mFilesListAdapter = new FileListAdapter(mMediaFileList, mSelectedFilePos);
-        mFilesListAdapter.setOnFileItemClickListener(this);
+        mFilesListAdapter.setOnItemClickListener(this);
         mRvFileList.setLayoutManager(linearLayoutManager);
         mRvFileList.setAdapter(mFilesListAdapter);
 
@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //文件选择监听
     @Override
-    public void onFileItemClick(View view, final int position) {
-        Log.d(TAG, "onFileItemClick: " + position);
+    public void onItemClick(View view, final int position) {
+        Log.d(TAG, "onItemClick: " + position);
         mSelectedFilePos = position;
         mTvFooterFileName.setText(mMediaFileList.get(position).getFileName());
         mMediaGridAdapter.setMediaList(null);
