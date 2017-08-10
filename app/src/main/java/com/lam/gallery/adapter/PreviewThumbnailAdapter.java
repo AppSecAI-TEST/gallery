@@ -8,9 +8,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.R;
+import com.lam.gallery.db.ConfigSpec;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
-import com.lam.gallery.factory.GalleryBitmapFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -59,7 +59,11 @@ public class PreviewThumbnailAdapter extends RecyclerView.Adapter implements Vie
         //渲染加载ui
         if(mCurrentPos == position)
             selectedView.setVisibility(View.VISIBLE);
-        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
+
+//        GalleryBitmapFactory.loadThumbnailWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), thumbnailImage, position);
+//        new ImageGather(ImageGather.LOAD_TYPE_THUMBNAIL).into(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
+//        ImageGather.with().into(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
+        ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>(thumbnailImage), position, mMediaList.get(position).getMediaId());
     }
 
     private class ThumbnailViewHolder extends RecyclerView.ViewHolder {

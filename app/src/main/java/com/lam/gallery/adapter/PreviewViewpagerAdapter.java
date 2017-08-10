@@ -3,12 +3,14 @@ package com.lam.gallery.adapter;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.db.ConfigSpec;
 import com.lam.gallery.db.Media;
-import com.lam.gallery.factory.GalleryBitmapFactory;
 import com.lam.gallery.ui.PreViewImageView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -35,7 +37,7 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        GalleryBitmapFactory.loadProcessBitmapWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), mediaImage, position);
+        ConfigSpec.getInstance().mImageEngine.loadProcessImage(new WeakReference<ImageView>(mediaImage), position, mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId());
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;

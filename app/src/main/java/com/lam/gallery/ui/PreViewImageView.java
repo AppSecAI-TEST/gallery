@@ -3,6 +3,7 @@ package com.lam.gallery.ui;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -58,12 +59,17 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     private static final String TAG = "PreViewImageView";
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mBitmapWidth = getDrawable().getIntrinsicWidth();
-        mBitmapHeight = getDrawable().getIntrinsicHeight();
+    public void setImageDrawable(@Nullable Drawable drawable) {
+        super.setImageDrawable(drawable);
+        mBitmapWidth = drawable.getIntrinsicWidth();
+        mBitmapHeight = drawable.getIntrinsicHeight();
         mScreenHeight = getHeight();
         mScreenWidth = getWidth();
         putCenter(1.0f * mScreenWidth / mBitmapWidth);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
     }
 

@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.db.ConfigSpec;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
@@ -35,7 +36,7 @@ public class UiManager {
             sendButton.setTextColor(0xFFA1A1A1);
         } else {
             sendButton.setBackgroundColor(0xFF19C917);
-            sendButton.setText("发送(" + selectedCount + "/9)");
+            sendButton.setText("发送(" + selectedCount + "/" + ConfigSpec.getInstance().mMaxSelected + ")");
             sendButton.setTextColor(Color.WHITE);
         }
     }

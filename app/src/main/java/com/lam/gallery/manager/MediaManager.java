@@ -17,6 +17,7 @@ import java.util.List;
 
 public class MediaManager {
 
+    private static final String TAG = "MediaManager";
     public void findAllMedia(InitDataListener listener) {
         List<Media> mediaList = new ArrayList<>();
         List<MediaFile> mediaFileList = new ArrayList<>();

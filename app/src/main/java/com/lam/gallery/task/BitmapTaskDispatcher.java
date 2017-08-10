@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import com.lam.gallery.db.ConfigSpec;
+
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +33,7 @@ public class BitmapTaskDispatcher {
 
     public static final int LIFO = 1;
     public static final int FIFO = 2;
-    public static final int DEFAULT_PERMITS_SIZE = Runtime.getRuntime().availableProcessors();
+    public static final int DEFAULT_PERMITS_SIZE = ConfigSpec.getInstance().mSemaphoreSubmitSize;
     public static final int DISPATCHER = 0X852;
 
     public BitmapTaskDispatcher(int permitSize, int type) {
@@ -124,15 +126,21 @@ public class BitmapTaskDispatcher {
     public static void shutDown() {
         if(mThreadPool != null) {
             mThreadPool.shutdown();
+            sLIFOTaskDispatcher = null;
+        }
+        if(mRunnableLinkedList != null) {
+            mRunnableLinkedList.clear();
         }
     }
 
-    public abstract static class TaskRunnable implements Runnable {
+    public abstract static class TaskRunnable<T> implements Runnable {
+
+        T mT;
 
         @Override
         public void run() {
             try {
-                doTask();
+                mT = doTask();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -140,7 +148,7 @@ public class BitmapTaskDispatcher {
             }
         }
 
-        public abstract void doTask();
+        public abstract T doTask();
     }
 
 }

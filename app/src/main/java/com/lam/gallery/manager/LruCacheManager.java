@@ -17,7 +17,7 @@ public class LruCacheManager {
             synchronized (LruCache.class) {
                 if(mLruCache == null) {
                     int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-                    int cacheSize = maxMemory / 4;
+                    int cacheSize = maxMemory / 8;
                     mLruCache = new LruCache<String, Bitmap>(cacheSize) {
                         @Override
                         protected int sizeOf(String key, Bitmap value) {
@@ -45,7 +45,7 @@ public class LruCacheManager {
     /**
      * 从缓存中获得Bitmap
      * @param key 以bitmap的路径作为键值
-     * @return 当缓存中没有该bitm时，返回 null
+     * @return 当缓存中没有该bitmap时，返回 null
      */
     public static Bitmap getBitmapFromCache(String key) {
         return getLruCache().get(key);

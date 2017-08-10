@@ -8,8 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lam.gallery.R;
+import com.lam.gallery.db.ConfigSpec;
 import com.lam.gallery.db.MediaFile;
-import com.lam.gallery.factory.GalleryBitmapFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -69,7 +69,8 @@ public class FileListAdapter extends RecyclerView.Adapter implements View.OnClic
             fileListViewHolder.getFileSelect().setImageResource(R.drawable.footer_circle_green_16);
             fileListViewHolder.getFileSelect().setVisibility(View.VISIBLE);
         }
-        GalleryBitmapFactory.loadThumbnailWithTag(mMediaFileList.get(position).getFileCoverPath(), mMediaFileList.get(position).getCoverPathId(), fileCoverView, position);
+        ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>(fileCoverView),
+                position, mMediaFileList.get(position).getCoverPathId());
     }
 
     private class FileListViewHolder extends RecyclerView.ViewHolder{

@@ -1,7 +1,7 @@
 package com.lam.gallery.activity;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,10 +27,11 @@ import com.lam.gallery.db.Media;
 import com.lam.gallery.db.MediaFile;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
-import com.lam.gallery.ui.ValueAnimatorManager;
 import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.UiManager;
+import com.lam.gallery.ui.ValueAnimatorManager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,13 +77,10 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     private FileListAdapter mFilesListAdapter;
     private Handler mHandler;
     private int mSelectedFilePos;
-    public static final String IS_FINISH_SELECT = "is finish select";
-
-    public static void start(Context context, boolean isFinishSelect) {
-        Intent starter = new Intent(context, MainActivity.class);
-        starter.putExtra(IS_FINISH_SELECT, isFinishSelect);
-        context.startActivity(starter);
-    }
+    public static final String EXTRA_RESULT_SELECTION_ID = "extra_result_selection_ids";
+    public static final String EXTRA_RESULT_SELECTION_PATH = "extra_result_selection_path";
+    public static final String EXTRA_RESULT_SELECTION_ORIGIN = "extra_result_selection_origin";
+    private static final int REQUEST_CODE_PREVIEW = 0x741;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,9 +102,10 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mHandler = new Handler();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
-            public void doTask() {
+            public Object doTask() {
                 MediaManager mediaManager = new MediaManager();
                 mediaManager.findAllMedia(MainActivity.this);
+                return null;
             }
         });
         //先加载空白的RecyclerView
@@ -118,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mFilesListAdapter.setOnFileItemClickListener(this);
         mRvFileList.setLayoutManager(linearLayoutManager);
         mRvFileList.setAdapter(mFilesListAdapter);
+
     }
 
     //监听事件的设定
@@ -179,14 +179,14 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         if(v.getId() == R.id.iv_footer_file_name || v.getId() == R.id.tv_footer_file_name || v.getId() == R.id.view_file_list_background)
             fileListAnimator();
         if(v.getId() == R.id.tv_footer_preview && SelectedMedia.selectedMediaCount() != 0)
-            PreviewActivity.start(this, -1, null);
-        if(v.getId() == R.id.bt_title_send && SelectedMedia.getSelectedMediaList().size() != 0) //反馈数据给客户端
-            finish();
+            PreviewActivity.start(new WeakReference<Activity>(MainActivity.this), -1, null, REQUEST_CODE_PREVIEW);
+        if(v.getId() == R.id.bt_title_send && SelectedMedia.getSelectedMediaList().size() != 0)        //反馈数据给客户端
+            intentForResult();
     }
 
     @Override
     public void clickToIntent(int position) {
-        PreviewActivity.start(this, position, mMediaFileList.get(mSelectedFilePos).getFileName());
+        PreviewActivity.start(new WeakReference<Activity>(MainActivity.this), position, mMediaFileList.get(mSelectedFilePos).getFileName(), REQUEST_CODE_PREVIEW);
     }
 
     @Override
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         } else {
             BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
                 @Override
-                public void doTask() {
+                public Object doTask() {
                     MediaManager mediaManager = new MediaManager();
                     mSelectMediaFileList = mediaManager.findMediaListByFileName(mMediaFileList.get(position).getFileName());
                     mHandler.post(new Runnable() {
@@ -227,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
                             mMediaGridAdapter.notifyDataSetChanged();
                         }
                     });
+                    return null;
                 }
             });
         }
@@ -238,10 +239,14 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //取消选择返回主module
     private void backToMain() {
-        BitmapTaskDispatcher.clear();
-        SelectedMedia.clearData();
-        UiManager.setIsOriginMedia(false);
-        finish();
+        if (mRvFileList.getHeight() != 0)
+            fileListAnimator();
+        else {
+            BitmapTaskDispatcher.clear();
+            SelectedMedia.clearData();
+            UiManager.setIsOriginMedia(false);
+            finish();
+        }
     }
 
     @Override
@@ -260,13 +265,6 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        setIntent(intent);
-        if(intent.getBooleanExtra(IS_FINISH_SELECT, false))
-            finish();
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         backToMain();
         return true;
@@ -275,6 +273,25 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     @Override
     protected void onDestroy() {
         BitmapTaskDispatcher.clear();
+        SelectedMedia.clearData();
+        BitmapTaskDispatcher.shutDown();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_CODE_PREVIEW && resultCode == RESULT_OK) {
+            intentForResult();
+        }
+    }
+
+    private void intentForResult() {
+        Intent result = new Intent();
+        result.putExtra(EXTRA_RESULT_SELECTION_ID, SelectedMedia.getSelectedMediaIds());
+        result.putStringArrayListExtra(EXTRA_RESULT_SELECTION_PATH, SelectedMedia.getSelectedMediaPath());
+        result.putExtra(EXTRA_RESULT_SELECTION_ORIGIN, UiManager.isOriginMedia);
+        setResult(RESULT_OK, result);
+        finish();
     }
 }

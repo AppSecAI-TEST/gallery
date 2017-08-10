@@ -1,7 +1,7 @@
 package com.lam.gallery.activity;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,11 +24,12 @@ import com.lam.gallery.adapter.PreviewViewpagerAdapter;
 import com.lam.gallery.db.Media;
 import com.lam.gallery.db.SelectedMedia;
 import com.lam.gallery.manager.MediaManager;
-import com.lam.gallery.ui.ValueAnimatorManager;
 import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.gallery.ui.ToastUtil;
 import com.lam.gallery.ui.UiManager;
+import com.lam.gallery.ui.ValueAnimatorManager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,11 +77,11 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     public static final String CLICK_POS = "click to enter position";
     public static final String PREVIEW_MEDIA_FILE_NAME = "need to preview media's file name";
 
-    public static void start(Context context, int clickEnterPos, String previewMediaFileName) {
-        Intent starter = new Intent(context, PreviewActivity.class);
+    public static void start(WeakReference<Activity> activityWeakReference, int clickEnterPos, String previewMediaFileName, int requestCode) {
+        Intent starter = new Intent(activityWeakReference.get(), PreviewActivity.class);
         starter.putExtra(CLICK_POS, clickEnterPos);
         starter.putExtra(PREVIEW_MEDIA_FILE_NAME, previewMediaFileName);
-        context.startActivity(starter);
+        activityWeakReference.get().startActivityForResult(starter, requestCode);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         BitmapTaskDispatcher.clear();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
-            public void doTask() {
+            public Object doTask() {
                 MediaManager mediaManager = new MediaManager();
                 if (fileName == null)    //通过点击预览进入
                     mPreviewMediaList.addAll(SelectedMedia.getSelectedMediaList());
@@ -129,6 +130,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                         initPreviewUi();
                     }
                 });
+                return null;
             }
         });
     }
@@ -212,9 +214,9 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         if (v.getId() == R.id.iv_footer_origin || v.getId() == R.id.tv_footer_origin)
             UiManager.listenerUpdateOrigin(mIvFooterOrigin);
         else if (v.getId() == R.id.iv_title_left_point)   //反馈数据给上一个activity
-            MainActivity.start(this, false);
+            intentForResult(false);
         else if (v.getId() == R.id.bt_title_send && SelectedMedia.selectedMediaCount() != 0)  //反馈数据给上一个activity
-            MainActivity.start(this, true);
+            intentForResult(true);
         else if(v.getId() == R.id.iv_footer_select || v.getId() == R.id.tv_footer_select ) {
             String clickPath = mPreviewMediaList.get(mViewPagerCurrentPos).getPath();
             int selectedPos = SelectedMedia.getSelectedPosition(clickPath);
@@ -292,5 +294,12 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         UiManager.updateSendButton(mBtTitleSend);
         mIvFooterSelect.setImageResource(R.drawable.select_alpha_16);
         UiManager.updateThumbnailVisibility(mRvPreviewThumbnail);
+    }
+
+    private void intentForResult(boolean isSend) {
+        Intent result = new Intent();
+        if(isSend)
+            setResult(RESULT_OK, result);
+        finish();
     }
 }

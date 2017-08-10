@@ -5,11 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lam.gallery.db.Media;
-import com.lam.gallery.factory.GalleryBitmapFactory;
 import com.lam.galleryhome.R;
 
 import java.util.List;
@@ -20,16 +17,17 @@ import java.util.List;
 
 public class PathShowAdapter extends RecyclerView.Adapter {
     private static final String TAG = "PathShowAdapter";
-    private List<Media> mMediaList;
     private boolean mIsOrigin;
 
-    public PathShowAdapter(List<Media> mediaList, boolean isOrigin) {
-        mMediaList = mediaList;
+    private List<String> mMediaPath;
+
+    public PathShowAdapter(boolean isOrigin, List<String> mediaPath) {
         mIsOrigin = isOrigin;
+        mMediaPath = mediaPath;
     }
 
-    public void setMediaList(List<Media> mediaList) {
-        mMediaList = mediaList;
+    public void setMediaPath(List<String> mediaPath) {
+        mMediaPath = mediaPath;
     }
 
     public void setOrigin(boolean origin) {
@@ -47,31 +45,15 @@ public class PathShowAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: ");
         SelectedDisplayListViewHolder selectedDisplayListViewHolder = (SelectedDisplayListViewHolder) holder;
-        final ImageView imageView = selectedDisplayListViewHolder.getImageView();
-        selectedDisplayListViewHolder.getPathTextView().setText("图片路径： " + mMediaList.get(position).getPath());
-        //设置标记
-        imageView.setTag(position);
-        //开始绑定渲染
-        final String path = mMediaList.get(position).getPath();
-        if(mIsOrigin) {
-            GalleryBitmapFactory.loadOriginBitmapWithTag(mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId(), imageView, position);
-        } else {
-            GalleryBitmapFactory.loadThumbnailWithTag(path, mMediaList.get(position).getMediaId(), imageView, position);
-        }
+        selectedDisplayListViewHolder.getPathTextView().setText("图片路径： " + mMediaPath.get(position));
     }
 
     public class SelectedDisplayListViewHolder extends RecyclerView.ViewHolder{
-        private ImageView mImageView;
         private TextView mPathTextView;
 
         public SelectedDisplayListViewHolder(View itemView) {
             super(itemView);
-            mImageView = (ImageView) itemView.findViewById(R.id.iv_image);
             mPathTextView = (TextView) itemView.findViewById(R.id.tv_path);
-        }
-
-        public ImageView getImageView() {
-            return mImageView;
         }
 
         public TextView getPathTextView() {
@@ -81,6 +63,6 @@ public class PathShowAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return mMediaList == null ? 0 : mMediaList.size();
+        return mMediaPath == null ? 0 : mMediaPath.size();
     }
 }

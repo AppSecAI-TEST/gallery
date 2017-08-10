@@ -13,7 +13,7 @@ import java.util.List;
 
 public class SelectedMedia {
     private static final String TAG = "SelectedMedia";
-    private static List<Media> selectedMediaList = new ArrayList<>();
+    private static List<Media> sSelectedMediaList = new ArrayList<>();
     private static UpdateUi sUpdateUi;
 
     /**
@@ -29,7 +29,31 @@ public class SelectedMedia {
      * @return List<Media>
      */
     public static List<Media> getSelectedMediaList() {
-        return selectedMediaList;
+        return sSelectedMediaList;
+    }
+
+    /**
+     * 获得被选中图片的路径列表
+     * @return
+     */
+    public static ArrayList<String> getSelectedMediaPath() {
+        ArrayList<String> pathList = new ArrayList<>();
+        for(int i = 0; i < sSelectedMediaList.size(); ++i) {
+            pathList.add(sSelectedMediaList.get(i).getPath());
+        }
+        return pathList;
+    }
+
+    /**
+     * 获得被选中图片的id数组
+     * @return
+     */
+    public static int[] getSelectedMediaIds() {
+        int[] mediaIds = new int[sSelectedMediaList.size()];
+        for(int i = 0; i < sSelectedMediaList.size(); ++i) {
+            mediaIds[i] = sSelectedMediaList.get(i).getMediaId();
+        }
+        return mediaIds;
     }
 
     /**
@@ -38,17 +62,17 @@ public class SelectedMedia {
      * @return
      */
     public static boolean addSelected(Media selectMedia) {
-        if(selectedMediaList.size() == 9) {
-            ToastUtil.showToast("你最多只能选择9张图片");
+        if(sSelectedMediaList.size() == ConfigSpec.getInstance().mMaxSelected) {
+            ToastUtil.showToast("你最多只能选择" + ConfigSpec.getInstance().mMaxSelected +"张图片");
             return false;
         } else {
-            if(selectedMediaList == null)
-                selectedMediaList = new ArrayList<>();
-            selectedMediaList.add(selectMedia);
+            if(sSelectedMediaList == null)
+                sSelectedMediaList = new ArrayList<>();
+            sSelectedMediaList.add(selectMedia);
             if(sUpdateUi != null) {
                 sUpdateUi.updateAddSelectMediaUi();
             }
-            Log.d(TAG, "addSelected: " + selectedMediaList.size());
+            Log.d(TAG, "addSelected: " + sSelectedMediaList.size());
             return true;
         }
     }
@@ -58,7 +82,7 @@ public class SelectedMedia {
      * @return
      */
     public static int selectedMediaCount() {
-        return selectedMediaList.size();
+        return sSelectedMediaList.size();
     }
 
     /**
@@ -66,11 +90,11 @@ public class SelectedMedia {
      * @param position Media对象在已选列表的位置position
      */
     public static void removeByPosition(int position) {
-        selectedMediaList.remove(position);
+        sSelectedMediaList.remove(position);
         if(sUpdateUi != null) {
             sUpdateUi.updateRemoveSelectMediaUi();
         }
-        Log.d(TAG, "removeByPosition: " + selectedMediaList.size());
+        Log.d(TAG, "removeByPosition: " + sSelectedMediaList.size());
     }
 
     /**
@@ -79,13 +103,13 @@ public class SelectedMedia {
      * @return
      */
     public static boolean removeByPath(String path) {
-        for(int i = 0; i < selectedMediaList.size(); ++i) {
-            if(selectedMediaList.get(i).getPath().equals(path)) {
+        for(int i = 0; i < sSelectedMediaList.size(); ++i) {
+            if(sSelectedMediaList.get(i).getPath().equals(path)) {
                 removeByPosition(i);
                 return true;
             }
         }
-        Log.d(TAG, "removeByPath: " + selectedMediaList.size());
+        Log.d(TAG, "removeByPath: " + sSelectedMediaList.size());
         return false;
     }
 
@@ -98,8 +122,8 @@ public class SelectedMedia {
      */
     public static int getSelectedPosition(String path) {
         int position = -1;
-        for(int i = 0; i < selectedMediaList.size(); ++i) {
-            if(selectedMediaList.get(i).getPath().equals(path)) {
+        for(int i = 0; i < sSelectedMediaList.size(); ++i) {
+            if(sSelectedMediaList.get(i).getPath().equals(path)) {
                 position = i;
             }
         }
@@ -110,7 +134,7 @@ public class SelectedMedia {
      * 清除已选图片列表的数据
      */
     public static void clearData() {
-        selectedMediaList.clear();
+        sSelectedMediaList.clear();
     }
 
     public interface UpdateUi {
