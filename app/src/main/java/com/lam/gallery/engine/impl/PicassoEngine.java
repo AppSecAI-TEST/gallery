@@ -3,9 +3,9 @@ package com.lam.gallery.engine.impl;
 import android.widget.ImageView;
 
 import com.lam.gallery.R;
-import com.lam.gallery.db.ConfigSpec;
+import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.engine.ImageEngine;
-import com.lam.gallery.manager.GalleryApplication;
+import com.lam.gallery.internal.GalleryApplication;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
 import com.squareup.picasso.Picasso;
 

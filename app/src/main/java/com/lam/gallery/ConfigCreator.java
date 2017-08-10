@@ -5,8 +5,8 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lam.gallery.activity.MainActivity;
-import com.lam.gallery.db.ConfigSpec;
+import com.lam.gallery.ui.MainActivity;
+import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.engine.ImageEngine;
 
 /**

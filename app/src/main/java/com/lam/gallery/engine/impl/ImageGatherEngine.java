@@ -4,7 +4,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.lam.gallery.engine.ImageEngine;
-import com.lam.gallery.engine.imageGather.ImageGather;
+import com.lam.gallery.internal.imageGather.ImageGather;
 
 import java.lang.ref.WeakReference;
 

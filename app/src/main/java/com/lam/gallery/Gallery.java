@@ -5,7 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.lam.gallery.activity.MainActivity;
+import com.lam.gallery.ui.MainActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
