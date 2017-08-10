@@ -14,7 +14,7 @@ public interface ImageEngine {
 
     void loadThumbnail(WeakReference<ImageView> imageViewWeakReference, Object tag, Object id);
 
-    void loadProcessImage(WeakReference<ImageView> imageViewWeakReference, Object tag, Object path, Object id);
+    void loadProcessImage(WeakReference<ImageView> imageViewWeakReference, int resizeX, int resizeY, Object tag, Object path, Object id);
 
     void loadImage(WeakReference<ImageView> imageViewWeakReference, Object tag, Object params);
 }

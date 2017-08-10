@@ -23,7 +23,7 @@ public class ImageGatherEngine implements ImageEngine {
     }
 
     @Override
-    public void loadProcessImage(WeakReference<ImageView> imageViewWeakReference, Object tag, Object path, Object id) {
+    public void loadProcessImage(WeakReference<ImageView> imageViewWeakReference, int resizeX, int resizeY, Object tag, Object path, Object id) {
         ImageGather.with()
                 .into(imageViewWeakReference, path, tag);
     }

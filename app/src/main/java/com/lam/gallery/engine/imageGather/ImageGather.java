@@ -61,6 +61,9 @@ public class ImageGather {
         if(! (Looper.getMainLooper().getThread() == Thread.currentThread())) {
             throw new IllegalStateException("ImageGather.into() should run in main thread.");
         }
+//        Log.d(TAG, "into: " + new LruCacheBitmapBuilder().loadBitmap(params));
+//        if(new LruCacheBitmapBuilder().loadBitmap(params) == null)
+//            imageViewWeakReference.get().setImageResource(R.drawable.loading);
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
             public Object doTask() {

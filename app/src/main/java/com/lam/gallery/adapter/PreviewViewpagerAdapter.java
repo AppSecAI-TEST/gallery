@@ -1,6 +1,10 @@
 package com.lam.gallery.adapter;
 
+import android.app.Activity;
+import android.graphics.Point;
+import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -8,6 +12,7 @@ import android.widget.ImageView;
 import com.lam.gallery.R;
 import com.lam.gallery.db.ConfigSpec;
 import com.lam.gallery.db.Media;
+import com.lam.gallery.ui.PhotoMetadataUtils;
 import com.lam.gallery.ui.PreViewImageView;
 
 import java.lang.ref.WeakReference;
@@ -21,23 +26,27 @@ public class PreviewViewpagerAdapter extends PagerAdapter implements PreViewImag
     private static final String TAG = "PreviewViewpagerAdapter";
     private List<Media> mMediaList;
     private static OnClickHeaderAndFooterChange sOnClickHeaderAndFooterChange;
+    private WeakReference<Activity> mActivityWeakReference;
 
     public void setOnClickHeaderAndFooterChange(OnClickHeaderAndFooterChange onClickHeaderAndFooterChange) {
         sOnClickHeaderAndFooterChange = onClickHeaderAndFooterChange;
     }
 
-    public PreviewViewpagerAdapter(List<Media> mediaList) {
+    public PreviewViewpagerAdapter(List<Media> mediaList, WeakReference<Activity> activityWeakReference) {
         mMediaList = mediaList;
+        mActivityWeakReference = activityWeakReference;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
+        Log.d(TAG, "instantiateItem: " + position);
         View view = View.inflate(container.getContext(), R.layout.item_preview_viewpager, null);
         final PreViewImageView mediaImage = (PreViewImageView) view.findViewById(R.id.pr_preview_media);
         //设置标记
         mediaImage.setTag(position);
         //渲染加载ui
-        ConfigSpec.getInstance().mImageEngine.loadProcessImage(new WeakReference<ImageView>(mediaImage), position, mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId());
+        Point size = PhotoMetadataUtils.getBitmapSize(Uri.parse("file://" + mMediaList.get(position).getPath()), mActivityWeakReference.get());
+        ConfigSpec.getInstance().mImageEngine.loadProcessImage(new WeakReference<ImageView>(mediaImage), size.x, size.y, position, mMediaList.get(position).getPath(), mMediaList.get(position).getMediaId());
         mediaImage.setOnClickItemViewListener(this);
         container.addView(view);
         return view;

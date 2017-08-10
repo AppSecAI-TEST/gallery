@@ -61,16 +61,28 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
         super.setImageDrawable(drawable);
-        mBitmapWidth = drawable.getIntrinsicWidth();
-        mBitmapHeight = drawable.getIntrinsicHeight();
-        mScreenHeight = getHeight();
-        mScreenWidth = getWidth();
-        putCenter(1.0f * mScreenWidth / mBitmapWidth);
+        Log.d(TAG, "setImageDrawable: " + drawable);
+        if(drawable != null) {
+            mBitmapWidth = drawable.getIntrinsicWidth();
+            mBitmapHeight = drawable.getIntrinsicHeight();
+            mScreenHeight = getHeight();
+            mScreenWidth = getWidth();
+            putCenter(1.0f * mScreenWidth / mBitmapWidth);
+            Log.d(TAG, "setImageDrawable: " + mBitmapWidth + "  " + mBitmapHeight);
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        if(getDrawable() != null) {
+            mBitmapWidth = getDrawable().getIntrinsicWidth();
+            mBitmapHeight = getDrawable().getIntrinsicHeight();
+            mScreenHeight = getHeight();
+            mScreenWidth = getWidth();
+            putCenter(1.0f * mScreenWidth / mBitmapWidth);
+            Log.d(TAG, "setImageDrawable: " + mBitmapWidth + "  " + mBitmapHeight);
+        }
     }
 
     //初始化图片数据

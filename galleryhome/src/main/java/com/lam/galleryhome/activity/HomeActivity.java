@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.Gallery;
-import com.lam.gallery.task.BitmapTaskDispatcher;
 import com.lam.galleryhome.R;
 import com.lam.galleryhome.adapter.PathShowAdapter;
 

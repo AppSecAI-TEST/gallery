@@ -112,7 +112,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = getIntent();
         mViewPagerCurrentPos = intent.getIntExtra(CLICK_POS, -1);
         final String fileName = intent.getStringExtra(PREVIEW_MEDIA_FILE_NAME);
-        BitmapTaskDispatcher.clear();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
             public Object doTask() {
@@ -160,7 +159,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
 
     //初始化viewPagerUi
     private void initPreviewUi() {
-        mPreviewViewpagerAdapter = new PreviewViewpagerAdapter(mPreviewMediaList);
+        mPreviewViewpagerAdapter = new PreviewViewpagerAdapter(mPreviewMediaList, new WeakReference<Activity>(PreviewActivity.this));
         mVpPreview.setAdapter(mPreviewViewpagerAdapter);
         mVpPreview.setCurrentItem(mViewPagerCurrentPos);
         mPreviewViewpagerAdapter.setOnClickHeaderAndFooterChange(this);

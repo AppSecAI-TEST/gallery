@@ -239,14 +239,10 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
 
     //取消选择返回主module
     private void backToMain() {
-        if (mRvFileList.getHeight() != 0)
-            fileListAnimator();
-        else {
-            BitmapTaskDispatcher.clear();
-            SelectedMedia.clearData();
-            UiManager.setIsOriginMedia(false);
-            finish();
-        }
+        BitmapTaskDispatcher.clear();
+        SelectedMedia.clearData();
+        UiManager.setIsOriginMedia(false);
+        finish();
     }
 
     @Override
@@ -256,17 +252,12 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        UiManager.updateOriginView(mIvFooterOrigin);
-        UiManager.updateSendButton(mBtTitleSend);
-        UiManager.updatePreViewText(mTvFooterPreview);
-        mMediaGridAdapter.notifyDataSetChanged();
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        backToMain();
+        if (mRvFileList.getHeight() != 0)
+            fileListAnimator();
+        else {
+            backToMain();
+        }
         return true;
     }
 
@@ -284,6 +275,10 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         if(requestCode == REQUEST_CODE_PREVIEW && resultCode == RESULT_OK) {
             intentForResult();
         }
+        UiManager.updateOriginView(mIvFooterOrigin);
+        UiManager.updateSendButton(mBtTitleSend);
+        UiManager.updatePreViewText(mTvFooterPreview);
+        mMediaGridAdapter.notifyDataSetChanged();
     }
 
     private void intentForResult() {
