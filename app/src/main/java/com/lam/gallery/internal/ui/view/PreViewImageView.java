@@ -62,7 +62,7 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
             putCenter(1.0f * mScreenWidth / mBitmapWidth);
             isDefault = true;
             mDefaultScaleSize = getScaleSize();
-            mMaxScaleSize = 2.0f * mScreenHeight / mBitmapHeight;
+            mMaxScaleSize = 3.0f * mScreenHeight / mBitmapHeight;
         }
     }
 
@@ -77,7 +77,7 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
             putCenter(1.0f * mScreenWidth / mBitmapWidth);
             isDefault = true;
             mDefaultScaleSize = getScaleSize();
-            mMaxScaleSize = 2.0f * mScreenHeight / mBitmapHeight;
+            mMaxScaleSize = 3.0f * mScreenHeight / mBitmapHeight;
         }
     }
 
