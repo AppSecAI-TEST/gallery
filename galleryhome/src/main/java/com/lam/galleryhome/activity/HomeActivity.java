@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.lam.gallery.Gallery;
+import com.lam.gallery.engine.impl.PicassoEngine;
 import com.lam.galleryhome.R;
 import com.lam.galleryhome.adapter.PathShowAdapter;
 
@@ -104,7 +105,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else if(requestCode == REQUEST_CODE_PERMISSION && resultCode == RESULT_OK) {
             Gallery.from(HomeActivity.this)
                     .choose()
-//                .imageEngine(new PicassoEngine())
+                .imageEngine(new PicassoEngine())
 //                .imageEngine(new ImageLoaderEngine())
                     .forResult(REQUEST_CODE_CHOOSE);
         }

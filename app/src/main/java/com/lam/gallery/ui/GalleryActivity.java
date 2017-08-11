@@ -39,9 +39,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MediaManager.InitDataListener, View.OnClickListener, MediaGridAdapter.onClickToIntent, SelectedMedia.UpdateUi, FileListAdapter.OnItemClickListener {
+public class GalleryActivity extends AppCompatActivity implements MediaManager.InitDataListener, View.OnClickListener, MediaGridAdapter.onClickToIntent, SelectedMedia.UpdateUi, FileListAdapter.OnItemClickListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "GalleryActivity";
     @BindView(R2.id.iv_title_left_point)
     ImageView mIvTitleLeftPoint;
     @BindView(R2.id.view_title_line)
@@ -98,14 +98,14 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         mMediaList = new ArrayList<>();
         mMediaFileList = new ArrayList<>();
         mSelectMediaFileList = new ArrayList<>();
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 3);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(GalleryActivity.this, 3);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(GalleryActivity.this);
         mHandler = new Handler();
         BitmapTaskDispatcher.getLIFOTaskDispatcher().addTask(new BitmapTaskDispatcher.TaskRunnable() {
             @Override
             public Object doTask() {
                 MediaManager mediaManager = new MediaManager();
-                mediaManager.findAllMedia(MainActivity.this);
+                mediaManager.findAllMedia(GalleryActivity.this);
                 return null;
             }
         });
@@ -180,14 +180,14 @@ public class MainActivity extends AppCompatActivity implements MediaManager.Init
         if(v.getId() == R.id.iv_footer_file_name || v.getId() == R.id.tv_footer_file_name || v.getId() == R.id.view_file_list_background)
             fileListAnimator();
         if(v.getId() == R.id.tv_footer_preview && SelectedMedia.selectedMediaCount() != 0)
-            PreviewActivity.start(new WeakReference<Activity>(MainActivity.this), -1, null, REQUEST_CODE_PREVIEW);
+            PreviewActivity.start(new WeakReference<Activity>(GalleryActivity.this), -1, null, REQUEST_CODE_PREVIEW);
         if(v.getId() == R.id.bt_title_send && SelectedMedia.getSelectedMediaList().size() != 0)        //反馈数据给客户端
             intentForResult();
     }
 
     @Override
     public void clickToIntent(int position) {
-        PreviewActivity.start(new WeakReference<Activity>(MainActivity.this), position, mMediaFileList.get(mSelectedFilePos).getFileName(), REQUEST_CODE_PREVIEW);
+        PreviewActivity.start(new WeakReference<Activity>(GalleryActivity.this), position, mMediaFileList.get(mSelectedFilePos).getFileName(), REQUEST_CODE_PREVIEW);
     }
 
     @Override

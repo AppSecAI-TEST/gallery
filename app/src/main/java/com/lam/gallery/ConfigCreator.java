@@ -5,7 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lam.gallery.ui.MainActivity;
+import com.lam.gallery.ui.GalleryActivity;
 import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.engine.ImageEngine;
 
@@ -79,7 +79,7 @@ public final class ConfigCreator {
         if(activity == null) {
             return;
         }
-        Intent intent = new Intent(activity, MainActivity.class);
+        Intent intent = new Intent(activity, GalleryActivity.class);
 
         Fragment fragment = mGallery.getFragment();
         if(fragment != null) {

@@ -5,7 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.lam.gallery.ui.MainActivity;
+import com.lam.gallery.ui.GalleryActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -41,15 +41,15 @@ public final class Gallery {
     }
 
     public static int[] obtainMediaIdsResult(Intent data) {
-        return data.getIntArrayExtra(MainActivity.EXTRA_RESULT_SELECTION_ID);
+        return data.getIntArrayExtra(GalleryActivity.EXTRA_RESULT_SELECTION_ID);
     }
 
     public static List<String> obtainMediaPathResult(Intent data) {
-        return data.getStringArrayListExtra(MainActivity.EXTRA_RESULT_SELECTION_PATH);
+        return data.getStringArrayListExtra(GalleryActivity.EXTRA_RESULT_SELECTION_PATH);
     }
 
     public static boolean obtainMediaIsOriginResult(Intent data) {
-        return data.getBooleanExtra(MainActivity.EXTRA_RESULT_SELECTION_ORIGIN, false);
+        return data.getBooleanExtra(GalleryActivity.EXTRA_RESULT_SELECTION_ORIGIN, false);
     }
 
     public ConfigCreator choose() {
