@@ -2,7 +2,9 @@ package com.lam.gallery.internal.ui.adapter;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,21 +14,25 @@ import com.lam.gallery.R;
 import com.lam.gallery.internal.entity.ConfigSpec;
 import com.lam.gallery.internal.entity.Media;
 import com.lam.gallery.internal.entity.SelectedMedia;
+import com.lam.gallery.internal.task.BitmapTaskDispatcher;
 import com.lam.gallery.internal.ui.view.GridViewImageItem;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-/**
- * Created by lenovo on 2017/8/1.
- */
+import static android.widget.NumberPicker.OnScrollListener.SCROLL_STATE_IDLE;
+import static android.widget.NumberPicker.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL;
+
 
 public class MediaGridAdapter extends BaseRecyclerViewAdapter<MediaGridAdapter.GridViewHolder> implements GridViewImageItem.OnIntentToPreviewListener {
+    private static final String TAG = "MediaGridAdapter";
     private List<Media> mMediaList;
     private static onClickToIntent sOnClickToIntent;
+    private boolean isLoad;
 
     public MediaGridAdapter(List<Media> mediaList) {
         mMediaList = mediaList;
+        isLoad = true;
     }
 
     public void setMediaList(List<Media> mediaList) {
@@ -42,11 +48,34 @@ public class MediaGridAdapter extends BaseRecyclerViewAdapter<MediaGridAdapter.G
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid, null);
         GridViewHolder gridViewHolder = new GridViewHolder(view);
         gridViewHolder.getGridViewImageItem().setOnIntentToPreviewListener(this);
+        getRecyclerView().get().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                int firstVisibleItem = ((GridLayoutManager)getRecyclerView().get().getLayoutManager()).findFirstVisibleItemPosition();
+                int lastVisibleItem = ((GridLayoutManager)getRecyclerView().get().getLayoutManager()).findLastVisibleItemPosition();
+                //静止加载
+                if(newState == SCROLL_STATE_IDLE) {
+                    isLoad = false;
+                    Log.d(TAG, "onScrollStateChanged: " + getRecyclerView().get().getChildAt(lastVisibleItem - firstVisibleItem));
+                    for(int i = firstVisibleItem; i <= lastVisibleItem; ++i) {
+                        ConfigSpec.getInstance().mImageEngine.loadThumbnail(
+                                new WeakReference<>((ImageView)getRecyclerView().get().getChildAt(i - firstVisibleItem).findViewById(R.id.gvi_media_image))
+                                , i, mMediaList.get(i).getMediaId());
+                    }
+                } else if(newState == SCROLL_STATE_TOUCH_SCROLL) {
+                    isLoad = true;
+                } else {
+                    isLoad = false;
+                    BitmapTaskDispatcher.clear();
+                }
+            }
+        });
         return gridViewHolder;
     }
 
     @Override
     public void onBindVH(MediaGridAdapter.GridViewHolder holder, int position) {
+        Log.d(TAG, "onBindVH: " + position);
         final ImageView selectImage = (holder).getImageView();
         final GridViewImageItem gridViewImageItem = ( holder).getGridViewImageItem();
         //初始化
@@ -63,7 +92,9 @@ public class MediaGridAdapter extends BaseRecyclerViewAdapter<MediaGridAdapter.G
             gridViewImageItem.setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
         }
         gridViewImageItem.setImageResource(R.drawable.loading);
-        ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>((ImageView)gridViewImageItem), position, mMediaList.get(position).getMediaId());
+        //防止滑动不加载第一次进入界面时不调用加载
+        if(isLoad)
+            ConfigSpec.getInstance().mImageEngine.loadThumbnail(new WeakReference<>((ImageView)gridViewImageItem), position, mMediaList.get(position).getMediaId());
         //设置监听
         selectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +130,7 @@ public class MediaGridAdapter extends BaseRecyclerViewAdapter<MediaGridAdapter.G
     class GridViewHolder extends RecyclerView.ViewHolder {
         private GridViewImageItem mGridViewImageItem;
         private ImageView mImageView;
-        public GridViewHolder(View itemView) {
+        GridViewHolder(View itemView) {
             super(itemView);
             mGridViewImageItem = (GridViewImageItem) itemView.findViewById(R.id.gvi_media_image);
             mImageView = (ImageView)itemView.findViewById(R.id.iv_media_select);

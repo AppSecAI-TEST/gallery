@@ -16,12 +16,12 @@ public class LruCacheManager {
         if(mLruCache == null) {
             synchronized (LruCache.class) {
                 if(mLruCache == null) {
-                    int maxMemory = (int) (Runtime.getRuntime().maxMemory());
+                    int maxMemory = (int) (Runtime.getRuntime().maxMemory()) / 1024;
                     int cacheSize = maxMemory / 4;
                     mLruCache = new LruCache<String, Bitmap>(cacheSize) {
                         @Override
                         protected int sizeOf(String key, Bitmap value) {
-                            return value.getByteCount();
+                            return value.getByteCount() / 1024;
                         }
                     };
                 }
@@ -50,6 +50,11 @@ public class LruCacheManager {
     public static Bitmap getBitmapFromCache(String key) {
         Log.d(TAG, "getBitmapFromCache: " + key + getLruCache().get(key));
         return getLruCache().get(key);
+    }
+
+    public static void clean() {
+        getLruCache().evictAll();
+        mLruCache = null;
     }
 
 }

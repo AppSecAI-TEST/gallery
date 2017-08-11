@@ -14,7 +14,9 @@ public abstract class BaseRecyclerViewAdapter <T extends RecyclerView.ViewHolder
     OnItemClickListener mOnItemClickListener;
     private WeakReference<RecyclerView> mRecyclerView;
 
-
+    public WeakReference<RecyclerView> getRecyclerView() {
+        return mRecyclerView;
+    }
 
     @Override
     public T onCreateViewHolder(ViewGroup parent, int viewType) {
