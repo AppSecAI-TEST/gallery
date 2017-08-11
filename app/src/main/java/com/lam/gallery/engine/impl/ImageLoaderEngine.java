@@ -24,6 +24,7 @@ public class ImageLoaderEngine implements ImageEngine {
                 .showImageOnLoading(R.drawable.loading)
                 .cacheInMemory(ConfigSpec.getInstance().mCache)
                 .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .showImageOnLoading(R.drawable.loading)
                 .build();
     }
 

@@ -140,10 +140,10 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
     //调整边缘问题
     private void adjustBound() {
         //当底部小于屏高的19/20并且顶部小于0，回弹底部
-        if(mLeftAndTopPoint.y < 0 && mRightAndBottomPoint.y < (19.0f / 20.0f * mScreenHeight))
+        if(mLeftAndTopPoint.y < 0 && mRightAndBottomPoint.y <= (19.0f / 20.0f * mScreenHeight))
             translationImage(0, (float) mScreenHeight - mRightAndBottomPoint.y);
         //当顶部大于1/20屏高并且底部大于0，回弹顶部
-        if(mLeftAndTopPoint.y > (1.0f / 20.0f * mScreenHeight) && mRightAndBottomPoint.y > mScreenHeight)
+        if(mLeftAndTopPoint.y >= (1.0f / 20.0f * mScreenHeight) && mRightAndBottomPoint.y > mScreenHeight)
             translationImage(0, -mLeftAndTopPoint.y);
         //当左大于1/20屏宽并且右大于屏宽，回弹左边
         if(mLeftAndTopPoint.x > (1.0f / 20.0f * mScreenWidth) && mRightAndBottomPoint.x > mScreenWidth)
@@ -194,7 +194,7 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
                 if((mRightAndBottomPoint.y - mLeftAndTopPoint.y) >= mScreenHeight) {  //如果本来图片宽度与屏幕相同
                     putCenter(1.5f * mScreenWidth / mBitmapWidth);
                 } else {
-                    putCenter(1.0f * mScreenHeight / mBitmapHeight);
+                    putCenter(1.1f * mScreenHeight / mBitmapHeight);
                 }
                 isDefault = false;
                 isEnlarged = !isEnlarged;
@@ -220,6 +220,13 @@ public class PreViewImageView extends android.support.v7.widget.AppCompatImageVi
             if(!isDefault) {
                 if((mRightAndBottomPoint.y - mLeftAndTopPoint.y) < mScreenHeight)
                     translationImage(-distanceX, 0);
+                else if((mLeftAndTopPoint.y > 0     //当顶部大于0
+                        && mLeftAndTopPoint.y < (1.0f / 20.0f * mScreenHeight)  //并且顶部小于1/20屏高
+                        && distanceY < 0)   //并且手势是下滑的时候
+                        || (mRightAndBottomPoint.y > (19.0f / 20.0f * mScreenHeight)       //当底部大于19/20屏高
+                        && mRightAndBottomPoint.y < mScreenHeight   //并且底部小于屏高
+                        && distanceY > 0))      //并且手势是上滑时
+                    translationImage(-distanceX, 0);        //只能水平移动而不能极限竖直移动——解决抖动问题
                 else translationImage(-distanceX, -distanceY);
             }
             return true;

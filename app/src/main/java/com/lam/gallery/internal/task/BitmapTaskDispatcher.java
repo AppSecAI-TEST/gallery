@@ -6,8 +6,9 @@ import android.os.Message;
 
 import com.lam.gallery.internal.entity.ConfigSpec;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -22,7 +23,7 @@ public class BitmapTaskDispatcher {
     private static BitmapTaskDispatcher sLIFOTaskDispatcher;
     private static BitmapTaskDispatcher sFIFOTaskDispatcher;
     //任务调度队列
-    private static LinkedList<TaskRunnable> mRunnableLinkedList;
+    private static List<TaskRunnable> sTaskRunnableList;
     private static ExecutorService mThreadPool;
     //轮询线程
     private static HandlerThread mPollThread;
@@ -74,7 +75,7 @@ public class BitmapTaskDispatcher {
         mThreadPool = Executors.newCachedThreadPool();
         ((ThreadPoolExecutor) mThreadPool).prestartCoreThread();
         mPollSemaphore = new Semaphore(permitSize);
-        mRunnableLinkedList = new LinkedList<>();
+        sTaskRunnableList = new ArrayList<>();
         mType = type;
         mPollThread = new HandlerThread("Poll Thread");
         mPollThread.start();
@@ -101,10 +102,14 @@ public class BitmapTaskDispatcher {
      * @return
      */
     private synchronized TaskRunnable getTask() {
-        if(mType == LIFO && mRunnableLinkedList.size() != 0) {
-            return mRunnableLinkedList.removeLast();
-        } else if(mType == FIFO && mRunnableLinkedList.size() != 0) {
-            return mRunnableLinkedList.removeFirst();
+        if(mType == LIFO && sTaskRunnableList.size() != 0) {
+            TaskRunnable taskRunnable = sTaskRunnableList.get(sTaskRunnableList.size() - 1);
+            sTaskRunnableList.remove(sTaskRunnableList.size() - 1);
+            return taskRunnable;
+        } else if(mType == FIFO && sTaskRunnableList.size() != 0) {
+            TaskRunnable taskRunnable = sTaskRunnableList.get(0);
+            sTaskRunnableList.remove(0);
+            return taskRunnable;
         }
         return null;
     }
@@ -114,14 +119,14 @@ public class BitmapTaskDispatcher {
      * @param runnable
      */
     public synchronized void addTask(TaskRunnable runnable) {
-        mRunnableLinkedList.add(runnable);
+        sTaskRunnableList.add(runnable);
         mPollHandler.sendEmptyMessage(DISPATCHER);
     }
 
 
     public static void clear() {
-        if(mRunnableLinkedList != null) {
-            mRunnableLinkedList.clear();
+        if(sTaskRunnableList != null) {
+            sTaskRunnableList.clear();
         }
     }
 
@@ -130,8 +135,8 @@ public class BitmapTaskDispatcher {
             mThreadPool.shutdown();
             sLIFOTaskDispatcher = null;
         }
-        if(mRunnableLinkedList != null) {
-            mRunnableLinkedList.clear();
+        if(sTaskRunnableList != null) {
+            sTaskRunnableList.clear();
         }
     }
 
