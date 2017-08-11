@@ -9,4 +9,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="EmptyTheme" parent="Theme.AppCompat.Dialog" >
+        <item name="android:windowBackground">@color/alpha</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+    </style>
+
 </resources>

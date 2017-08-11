@@ -1,18 +1,22 @@
 package com.lam.galleryhome.activity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +24,23 @@ import java.util.List;
 public class PermissionActivity extends AppCompatActivity {
     private static final String TAG = "PermissionActivity";
     private static int REQUEST_CODE_PERMISSION = 0x001;
+    public static final String PERMISSIONS = "permissions";
+    public static final String PERMISSIONS_REQUEST_CODE = "permissions requestCode";
+
+    public static void start(WeakReference<Activity> weakReferenceActivity, int requestCode, String[] permissions, int permissionsRequestCode) {
+        Intent starter = new Intent(weakReferenceActivity.get(), PermissionActivity.class);
+        starter.putExtra(PERMISSIONS, permissions);
+        starter.putExtra(PERMISSIONS_REQUEST_CODE, permissionsRequestCode);
+        weakReferenceActivity.get().startActivityForResult(starter, requestCode);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_permission);
+        Intent intent = getIntent();
+        requestPermission(intent.getStringArrayExtra(PERMISSIONS), intent.getIntExtra(PERMISSIONS_REQUEST_CODE, 0));
+    }
 
     /**
      * 请求权限
@@ -106,12 +127,14 @@ public class PermissionActivity extends AppCompatActivity {
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        finish();
                     }
                 })
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         startAppSettings();
+                        finish();
                     }
                 }).show();
     }
@@ -131,6 +154,8 @@ public class PermissionActivity extends AppCompatActivity {
      */
     public void permissionSuccess(int requestCode) {
         Log.d(TAG, "获取权限成功:" + requestCode);
+        setResult(RESULT_OK);
+        finish();
     }
 
     /**
