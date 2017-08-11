@@ -35,6 +35,10 @@ public class MediaGridAdapter extends BaseRecyclerViewAdapter<MediaGridAdapter.G
         isLoad = true;
     }
 
+    public void setLoad(boolean load) {
+        isLoad = load;
+    }
+
     public void setMediaList(List<Media> mediaList) {
         mMediaList = mediaList;
     }

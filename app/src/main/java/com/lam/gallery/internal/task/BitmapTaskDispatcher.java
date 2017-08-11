@@ -6,6 +6,7 @@ import android.os.Message;
 
 import com.lam.gallery.internal.entity.ConfigSpec;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +31,7 @@ public class BitmapTaskDispatcher {
     //信号量
     private static volatile Semaphore mPollSemaphore;
     private int mType;
+    private HashMap<Object, TaskRunnable> mCurrentMap;
 
     private static final int LIFO = 1;
     private static final int FIFO = 2;

@@ -167,6 +167,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaManager.I
                 mMediaGridAdapter.setMediaList(mMediaList);
                 mMediaGridAdapter.notifyDataSetChanged();
                 mFilesListAdapter.setMediaFileList(mediaFileList);
+                mMediaGridAdapter.setLoad(true);
             }
         });
     }
@@ -236,6 +237,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaManager.I
         fileListAnimator();
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
+        mMediaGridAdapter.setLoad(true);
     }
 
     //取消选择返回主module
@@ -280,6 +282,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaManager.I
         UiManager.updateSendButton(mBtTitleSend);
         UiManager.updatePreViewText(mTvFooterPreview);
         mMediaGridAdapter.notifyDataSetChanged();
+        mMediaGridAdapter.setLoad(true);
     }
 
     private void intentForResult() {
